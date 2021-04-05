@@ -1,1 +1,2968 @@
-this.dash_resumable_upload=function(e){function t(n){if(r[n])return r[n].exports;var a=r[n]={exports:{},id:n,loaded:!1};return e[n].call(a.exports,a,a.exports,t),a.loaded=!0,a.exports}var r={};return t.m=e,t.c=r,t.p="",t(0)}([function(e,t,r){"use strict";function n(e){return e&&e.__esModule?e:{default:e}}Object.defineProperty(t,"__esModule",{value:!0}),t.Upload=void 0;var a=r(1),i=n(a);t.Upload=i.default},function(e,t,r){"use strict";function n(e){return e&&e.__esModule?e:{default:e}}function a(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}function i(e,t){if(!e)throw new ReferenceError("this hasn't been initialised - super() hasn't been called");return!t||"object"!=typeof t&&"function"!=typeof t?e:t}function s(e,t){if("function"!=typeof t&&null!==t)throw new TypeError("Super expression must either be null or a function, not "+typeof t);e.prototype=Object.create(t&&t.prototype,{constructor:{value:e,enumerable:!1,writable:!0,configurable:!0}}),t&&(Object.setPrototypeOf?Object.setPrototypeOf(e,t):e.__proto__=t)}Object.defineProperty(t,"__esModule",{value:!0});var o=function(){function e(e,t){for(var r=0;r<t.length;r++){var n=t[r];n.enumerable=n.enumerable||!1,n.configurable=!0,"value"in n&&(n.writable=!0),Object.defineProperty(e,n.key,n)}}return function(t,r,n){return r&&e(t.prototype,r),n&&e(t,n),t}}(),l=r(6),u=n(l),p=r(3),f=n(p),c=r(5),d=n(c),h=function(e){function t(e){a(this,t);var r=i(this,(t.__proto__||Object.getPrototypeOf(t)).call(this,e));return r.state={progressBar:0,messageStatus:"",fileList:{files:[]},isPaused:!1,isUploading:!1,isHovered:!1,isComplete:!1},r.toggleHovered=r.toggleHovered.bind(r),r.cancelUpload=r.cancelUpload.bind(r),r.pauseUpload=r.pauseUpload.bind(r),r.startUpload=r.startUpload.bind(r),r.resumable=null,r}return s(t,e),o(t,[{key:"componentDidMount",value:function(){var e=this,t=new d.default({target:this.props.service,query:{},fileType:this.props.filetypes,maxFiles:this.props.maxFiles,maxFileSize:this.props.maxFileSize,fileTypeErrorCallback:function(){e.setState({messageStatus:"Invalid file type!"})},testMethod:"post",testChunks:!1,headers:{},chunkSize:this.props.chunkSize,simultaneousUploads:this.props.simultaneousUploads,forceChunkSize:!1});t.assignBrowse(this.uploader),this.props.disableDragAndDrop===!1&&t.assignDrop(this.dropZone),t.on("fileAdded",function(r){e.setState({messageStatus:e.props.fileAddedMessage||" Starting upload! of "+r.fileName,isComplete:!1}),"function"==typeof e.props.onFileAdded?e.props.onFileAdded(r,e.resumable):t.upload()}),t.on("fileSuccess",function(t,r){if(e.props.fileNameServer){var n=JSON.parse(r);t.fileName=n[e.props.fileNameServer]}else t.fileName=r;var a=e.state.fileList.files;a.push(t);var i=e.props.fileNames;i.push(t.fileName),e.props.setProps&&e.props.setProps({fileNames:i}),e.setState({fileList:{files:a},isComplete:!0,messageStatus:e.props.completedMessage+t.fileName||r},function(){"function"==typeof e.props.onFileSuccess&&e.props.onFileSuccess(t,r)})}),t.on("progress",function(){e.setState({isUploading:t.isUploading()}),100*t.progress()<100?e.setState({messageStatus:parseInt(100*t.progress(),10)+"%",progressBar:100*t.progress()}):setTimeout(function(){e.setState({progressBar:0})},1e3)}),t.on("fileError",function(t,r){e.props.onUploadErrorCallback(t,r)}),this.resumable=t}},{key:"cancelUpload",value:function(){this.resumable.cancel(),this.setState({fileList:{files:[]}})}},{key:"pauseUpload",value:function(){this.state.isPaused?(this.resumable.upload(),this.setState({isPaused:!1,isUploading:!0})):(this.resumable.pause(),this.setState({isPaused:!0,isUploading:!0}))}},{key:"startUpload",value:function(){this.setState({isPaused:!1})}},{key:"toggleHovered",value:function(){this.setState({isHovered:!this.state.isHovered})}},{key:"render",value:function(){var e=this,t=null,r=null;this.props.textLabel&&(r=this.props.textLabel);var n=null;this.props.startButton&&(n="string"==typeof this.props.startButton||"boolean"==typeof this.props.startButton?u.default.createElement("label",null,u.default.createElement("button",{disabled:this.state.isUploading,className:"resumable-btn-start",onClick:this.startUpload},this.props.startButton&&"upload")):this.props.startButton);var a=null;this.props.cancelButton&&(a="string"==typeof this.props.cancelButton||"boolean"==typeof this.props.cancelButton?u.default.createElement("label",null,u.default.createElement("button",{disabled:!this.state.isUploading,className:"resumable-btn-cancel",onClick:this.cancelUpload},this.props.cancelButton&&"cancel")):this.props.cancelButton);var i=null;this.props.pauseButton&&(i="string"==typeof this.props.pauseButton||"boolean"==typeof this.props.pauseButton?u.default.createElement("label",null,u.default.createElement("button",{disabled:!this.state.isUploading,className:"resumable-btn-pause",onClick:this.pauseUpload},this.props.pauseButton&&(this.state.isPaused?"resume":"pause"))):this.props.pauseButton);var s=function(){return e.state.isComplete?e.props.completeStyle:e.state.isHovered||e.state.isUploading?e.props.activeStyle:e.props.defaultStyle},o=function(){return e.props.disabledInput?e.props.disableClass:e.state.isHovered?e.props.hoveredClass:e.state.isUploading?e.props.uploadingClass:e.state.isComplete?e.props.completeClass:e.state.isPaused?e.props.completeClass:e.props.className};return u.default.createElement("div",{id:this.props.id,className:o(),ref:function(t){return e.dropZone=t}},u.default.createElement("label",{style:s(),onMouseEnter:this.toggleHovered,onMouseLeave:this.toggleHovered},""==this.state.messageStatus?r:this.state.messageStatus,u.default.createElement("input",{ref:function(t){return e.uploader=t},type:"file",className:"btn",name:this.props.id+"-upload",accept:this.props.fileAccept||"*",disabled:this.props.disableInput||!1,style:{opacity:"0",width:"0.1px%",height:"0.1px%",position:"absolute",overflow:"hidden","z-index":"-1"}})),u.default.createElement("div",{className:"progress",style:{display:0===this.state.progressBar?"none":"block"}},u.default.createElement("div",{className:"progress-bar",style:{width:this.state.progressBar+"%",height:"100%"}})),t,n,i,a)}}]),t}(l.Component);t.default=h,h.propTypes={maxFiles:f.default.number,maxFileSize:f.default.number,chunkSize:f.default.number,simultaneousUploads:f.default.number,service:f.default.string,className:f.default.string,hoveredClass:f.default.string,disabledClass:f.default.string,pausedClass:f.default.string,completeClass:f.default.string,uploadingClass:f.default.string,defaultStyle:f.default.object,activeStyle:f.default.object,completeStyle:f.default.object,textLabel:f.default.string,completedMessage:f.default.string,fileNames:f.default.arrayOf(f.default.string),filetypes:f.default.arrayOf(f.default.string),startButton:f.default.bool,pauseButton:f.default.bool,cancelButton:f.default.bool,disableDragAndDrop:f.default.bool,setProps:f.default.func,id:f.default.string},h.defaultProps={maxFiles:1,maxFileSize:10485760,chunkSize:1048576,simultaneuosUploads:1,service:"/upload",className:"resumable-default",hoveredClass:"resumable-hovered",completeClass:"resumable-complete",disabledClass:"resumable-disabled",pausedClass:"resumable-paused",uploadingClass:"resumable-uploading",defaultStyle:{},activeStyle:{},completeStyle:{},textLabel:"Click Here to Select a File",completedMessage:"Complete! ",fileNames:[],filetypes:void 0,startButton:!0,pauseButton:!0,cancelButton:!0,disableDragAndDrop:!1,id:"default-uploader-id"}},function(e,t,r){"use strict";function n(){}function a(){}var i=r(4);a.resetWarningCache=n,e.exports=function(){function e(e,t,r,n,a,s){if(s!==i){var o=new Error("Calling PropTypes validators directly is not supported by the `prop-types` package. Use PropTypes.checkPropTypes() to call them. Read more at http://fb.me/use-check-prop-types");throw o.name="Invariant Violation",o}}function t(){return e}e.isRequired=e;var r={array:e,bool:e,func:e,number:e,object:e,string:e,symbol:e,any:e,arrayOf:t,element:e,elementType:e,instanceOf:t,node:e,objectOf:t,oneOf:t,oneOfType:t,shape:t,exact:t,checkPropTypes:a,resetWarningCache:n};return r.PropTypes=r,r}},function(e,t,r){e.exports=r(2)()},function(e,t){"use strict";var r="SECRET_DO_NOT_PASS_THIS_OR_YOU_WILL_BE_FIRED";e.exports=r},function(e,t,r){!function(){"use strict";var t=function(e){function r(e,t,r,n){var i;return e.isFile?e.file(function(e){e.relativePath=t+e.name,r.push(e),n()}):(e.isDirectory?i=e:e instanceof File&&r.push(e),"function"==typeof e.webkitGetAsEntry&&(i=e.webkitGetAsEntry()),i&&i.isDirectory?a(i,t+i.name+"/",r,n):("function"==typeof e.getAsFile&&(e=e.getAsFile(),e instanceof File&&(e.relativePath=t+e.name,r.push(e))),void n()))}function n(e,t){return e&&0!==e.length?void e[0](function(){n(e.slice(1),t)}):t()}function a(e,t,a,i){var s=e.createReader();s.readEntries(function(e){return e.length?void n(e.map(function(e){return r.bind(null,e,t,a)}),i):i()})}function i(e,t){if(e.length){l.fire("beforeAdd");var a=[];n(Array.prototype.map.call(e,function(e){return r.bind(null,e,"",a)}),function(){a.length&&c(a,t)})}}function s(e,t,r){var n=this;n.opts={},n.getOpt=e.getOpt,n._prevProgress=0,n.resumableObj=e,n.file=t,n.fileName=t.fileName||t.name,n.size=t.size,n.relativePath=t.relativePath||t.webkitRelativePath||n.fileName,n.uniqueIdentifier=r,n._pause=!1,n.container="";var a=void 0!==r,i=function(e,t){switch(e){case"progress":n.resumableObj.fire("fileProgress",n,t);break;case"error":n.abort(),a=!0,n.chunks=[],n.resumableObj.fire("fileError",n,t);break;case"success":if(a)return;n.resumableObj.fire("fileProgress",n),n.isComplete()&&n.resumableObj.fire("fileSuccess",n,t);break;case"retry":n.resumableObj.fire("fileRetry",n)}};return n.chunks=[],n.abort=function(){var e=0;u.each(n.chunks,function(t){"uploading"==t.status()&&(t.abort(),e++)}),e>0&&n.resumableObj.fire("fileProgress",n)},n.cancel=function(){var e=n.chunks;n.chunks=[],u.each(e,function(e){"uploading"==e.status()&&(e.abort(),n.resumableObj.uploadNextChunk())}),n.resumableObj.removeFile(n),n.resumableObj.fire("fileProgress",n)},n.retry=function(){n.bootstrap();var e=!1;n.resumableObj.on("chunkingComplete",function(){e||n.resumableObj.upload(),e=!0})},n.bootstrap=function(){n.abort(),a=!1,n.chunks=[],n._prevProgress=0;for(var e=n.getOpt("forceChunkSize")?Math.ceil:Math.floor,t=Math.max(e(n.file.size/n.getOpt("chunkSize")),1),r=0;r<t;r++)!function(e){window.setTimeout(function(){n.chunks.push(new o(n.resumableObj,n,e,i)),n.resumableObj.fire("chunkingProgress",n,e/t)},0)}(r);window.setTimeout(function(){n.resumableObj.fire("chunkingComplete",n)},0)},n.progress=function(){if(a)return 1;var e=0,t=!1;return u.each(n.chunks,function(r){"error"==r.status()&&(t=!0),e+=r.progress(!0)}),e=t?1:e>.99999?1:e,e=Math.max(n._prevProgress,e),n._prevProgress=e,e},n.isUploading=function(){var e=!1;return u.each(n.chunks,function(t){if("uploading"==t.status())return e=!0,!1}),e},n.isComplete=function(){var e=!1;return u.each(n.chunks,function(t){var r=t.status();if("pending"==r||"uploading"==r||1===t.preprocessState)return e=!0,!1}),!e},n.pause=function(e){"undefined"==typeof e?n._pause=!n._pause:n._pause=e},n.isPaused=function(){return n._pause},n.resumableObj.fire("chunkingStart",n),n.bootstrap(),this}function o(e,t,r,n){var a=this;a.opts={},a.getOpt=e.getOpt,a.resumableObj=e,a.fileObj=t,a.fileObjSize=t.size,a.fileObjType=t.file.type,a.offset=r,a.callback=n,a.lastProgressCallback=new Date,a.tested=!1,a.retries=0,a.pendingRetry=!1,a.preprocessState=0;var i=a.getOpt("chunkSize");return a.loaded=0,a.startByte=a.offset*i,a.endByte=Math.min(a.fileObjSize,(a.offset+1)*i),a.fileObjSize-a.endByte<i&&!a.getOpt("forceChunkSize")&&(a.endByte=a.fileObjSize),a.xhr=null,a.test=function(){a.xhr=new XMLHttpRequest;var e=function(e){a.tested=!0;var t=a.status();"success"==t?(a.callback(t,a.message()),a.resumableObj.uploadNextChunk()):a.send()};a.xhr.addEventListener("load",e,!1),a.xhr.addEventListener("error",e,!1),a.xhr.addEventListener("timeout",e,!1);var t=[],r=a.getOpt("parameterNamespace"),n=a.getOpt("query");"function"==typeof n&&(n=n(a.fileObj,a)),u.each(n,function(e,n){t.push([encodeURIComponent(r+e),encodeURIComponent(n)].join("="))}),t=t.concat([["chunkNumberParameterName",a.offset+1],["chunkSizeParameterName",a.getOpt("chunkSize")],["currentChunkSizeParameterName",a.endByte-a.startByte],["totalSizeParameterName",a.fileObjSize],["typeParameterName",a.fileObjType],["identifierParameterName",a.fileObj.uniqueIdentifier],["fileNameParameterName",a.fileObj.fileName],["relativePathParameterName",a.fileObj.relativePath],["totalChunksParameterName",a.fileObj.chunks.length]].filter(function(e){return a.getOpt(e[0])}).map(function(e){return[r+a.getOpt(e[0]),encodeURIComponent(e[1])].join("=")})),a.xhr.open(a.getOpt("testMethod"),u.getTarget("test",t)),a.xhr.timeout=a.getOpt("xhrTimeout"),a.xhr.withCredentials=a.getOpt("withCredentials");var i=a.getOpt("headers");"function"==typeof i&&(i=i(a.fileObj,a)),u.each(i,function(e,t){a.xhr.setRequestHeader(e,t)}),a.xhr.send(null)},a.preprocessFinished=function(){a.preprocessState=2,a.send()},a.send=function(){var e=a.getOpt("preprocess");if("function"==typeof e)switch(a.preprocessState){case 0:return a.preprocessState=1,void e(a);case 1:return;case 2:}if(a.getOpt("testChunks")&&!a.tested)return void a.test();a.xhr=new XMLHttpRequest,a.xhr.upload.addEventListener("progress",function(e){new Date-a.lastProgressCallback>1e3*a.getOpt("throttleProgressCallbacks")&&(a.callback("progress"),a.lastProgressCallback=new Date),a.loaded=e.loaded||0},!1),a.loaded=0,a.pendingRetry=!1,a.callback("progress");var t=function(e){var t=a.status();if("success"==t||"error"==t)a.callback(t,a.message()),a.resumableObj.uploadNextChunk();else{a.callback("retry",a.message()),a.abort(),a.retries++;var r=a.getOpt("chunkRetryInterval");void 0!==r?(a.pendingRetry=!0,setTimeout(a.send,r)):a.send()}};a.xhr.addEventListener("load",t,!1),a.xhr.addEventListener("error",t,!1),a.xhr.addEventListener("timeout",t,!1);var r=[["chunkNumberParameterName",a.offset+1],["chunkSizeParameterName",a.getOpt("chunkSize")],["currentChunkSizeParameterName",a.endByte-a.startByte],["totalSizeParameterName",a.fileObjSize],["typeParameterName",a.fileObjType],["identifierParameterName",a.fileObj.uniqueIdentifier],["fileNameParameterName",a.fileObj.fileName],["relativePathParameterName",a.fileObj.relativePath],["totalChunksParameterName",a.fileObj.chunks.length]].filter(function(e){return a.getOpt(e[0])}).reduce(function(e,t){return e[a.getOpt(t[0])]=t[1],e},{}),n=a.getOpt("query");"function"==typeof n&&(n=n(a.fileObj,a)),u.each(n,function(e,t){r[e]=t});var i=a.fileObj.file.slice?"slice":a.fileObj.file.mozSlice?"mozSlice":a.fileObj.file.webkitSlice?"webkitSlice":"slice",s=a.fileObj.file[i](a.startByte,a.endByte,a.getOpt("setChunkTypeFromFile")?a.fileObj.file.type:""),o=null,l=[],p=a.getOpt("parameterNamespace");if("octet"===a.getOpt("method"))o=s,u.each(r,function(e,t){l.push([encodeURIComponent(p+e),encodeURIComponent(t)].join("="))});else if(o=new FormData,u.each(r,function(e,t){o.append(p+e,t),l.push([encodeURIComponent(p+e),encodeURIComponent(t)].join("="))}),"blob"==a.getOpt("chunkFormat"))o.append(p+a.getOpt("fileParameterName"),s,a.fileObj.fileName);else if("base64"==a.getOpt("chunkFormat")){var f=new FileReader;f.onload=function(e){o.append(p+a.getOpt("fileParameterName"),f.result),a.xhr.send(o)},f.readAsDataURL(s)}var c=u.getTarget("upload",l),d=a.getOpt("uploadMethod");a.xhr.open(d,c),"octet"===a.getOpt("method")&&a.xhr.setRequestHeader("Content-Type","application/octet-stream"),a.xhr.timeout=a.getOpt("xhrTimeout"),a.xhr.withCredentials=a.getOpt("withCredentials");var h=a.getOpt("headers");"function"==typeof h&&(h=h(a.fileObj,a)),u.each(h,function(e,t){a.xhr.setRequestHeader(e,t)}),"blob"==a.getOpt("chunkFormat")&&a.xhr.send(o)},a.abort=function(){a.xhr&&a.xhr.abort(),a.xhr=null},a.status=function(){return a.pendingRetry?"uploading":a.xhr?a.xhr.readyState<4?"uploading":200==a.xhr.status||201==a.xhr.status?"success":u.contains(a.getOpt("permanentErrors"),a.xhr.status)||a.retries>=a.getOpt("maxChunkRetries")?"error":(a.abort(),"pending"):"pending"},a.message=function(){return a.xhr?a.xhr.responseText:""},a.progress=function(e){"undefined"==typeof e&&(e=!1);var t=e?(a.endByte-a.startByte)/a.fileObjSize:1;if(a.pendingRetry)return 0;a.xhr&&a.xhr.status||(t*=.95);var r=a.status();switch(r){case"success":case"error":return 1*t;case"pending":return 0*t;default:return a.loaded/(a.endByte-a.startByte)*t}},this}if(!(this instanceof t))return new t(e);if(this.version=1,this.support=!("undefined"==typeof File||"undefined"==typeof Blob||"undefined"==typeof FileList||!Blob.prototype.webkitSlice&&!Blob.prototype.mozSlice&&!Blob.prototype.slice),!this.support)return!1;var l=this;l.files=[],l.defaults={chunkSize:1048576,forceChunkSize:!1,simultaneousUploads:3,fileParameterName:"file",chunkNumberParameterName:"resumableChunkNumber",chunkSizeParameterName:"resumableChunkSize",currentChunkSizeParameterName:"resumableCurrentChunkSize",totalSizeParameterName:"resumableTotalSize",typeParameterName:"resumableType",identifierParameterName:"resumableIdentifier",fileNameParameterName:"resumableFilename",relativePathParameterName:"resumableRelativePath",totalChunksParameterName:"resumableTotalChunks",throttleProgressCallbacks:.5,query:{},headers:{},preprocess:null,method:"multipart",uploadMethod:"POST",testMethod:"GET",prioritizeFirstAndLastChunk:!1,target:"/",testTarget:null,parameterNamespace:"",testChunks:!0,generateUniqueIdentifier:null,getTarget:null,maxChunkRetries:100,chunkRetryInterval:void 0,permanentErrors:[400,404,415,500,501],maxFiles:void 0,withCredentials:!1,xhrTimeout:0,clearInput:!0,chunkFormat:"blob",setChunkTypeFromFile:!1,maxFilesErrorCallback:function(e,t){var r=l.getOpt("maxFiles");alert("Please upload no more than "+r+" file"+(1===r?"":"s")+" at a time.")},minFileSize:1,minFileSizeErrorCallback:function(e,t){alert(e.fileName||e.name+" is too small, please upload files larger than "+u.formatSize(l.getOpt("minFileSize"))+".")},maxFileSize:void 0,maxFileSizeErrorCallback:function(e,t){alert(e.fileName||e.name+" is too large, please upload files less than "+u.formatSize(l.getOpt("maxFileSize"))+".")},fileType:[],fileTypeErrorCallback:function(e,t){alert(e.fileName||e.name+" has type not allowed, please upload files of type "+l.getOpt("fileType")+".")}},l.opts=e||{},l.getOpt=function(e){var r=this;if(e instanceof Array){var n={};return u.each(e,function(e){n[e]=r.getOpt(e)}),n}if(r instanceof o){if("undefined"!=typeof r.opts[e])return r.opts[e];r=r.fileObj}if(r instanceof s){if("undefined"!=typeof r.opts[e])return r.opts[e];r=r.resumableObj}if(r instanceof t)return"undefined"!=typeof r.opts[e]?r.opts[e]:r.defaults[e]},l.events=[],l.on=function(e,t){l.events.push(e.toLowerCase(),t)},l.fire=function(){for(var e=[],t=0;t<arguments.length;t++)e.push(arguments[t]);for(var r=e[0].toLowerCase(),t=0;t<=l.events.length;t+=2)l.events[t]==r&&l.events[t+1].apply(l,e.slice(1)),"catchall"==l.events[t]&&l.events[t+1].apply(null,e);"fileerror"==r&&l.fire("error",e[2],e[1]),"fileprogress"==r&&l.fire("progress")};var u={stopEvent:function(e){e.stopPropagation(),e.preventDefault()},each:function(e,t){if("undefined"!=typeof e.length){for(var r=0;r<e.length;r++)if(t(e[r])===!1)return}else for(r in e)if(t(r,e[r])===!1)return},generateUniqueIdentifier:function(e,t){var r=l.getOpt("generateUniqueIdentifier");if("function"==typeof r)return r(e,t);var n=e.webkitRelativePath||e.fileName||e.name,a=e.size;return a+"-"+n.replace(/[^0-9a-zA-Z_-]/gim,"")},contains:function(e,t){var r=!1;return u.each(e,function(e){return e!=t||(r=!0,!1)}),r},formatSize:function(e){return e<1024?e+" bytes":e<1048576?(e/1024).toFixed(0)+" KB":e<1073741824?(e/1024/1024).toFixed(1)+" MB":(e/1024/1024/1024).toFixed(1)+" GB"},getTarget:function(e,t){var r=l.getOpt("target");if("test"===e&&l.getOpt("testTarget")&&(r="/"===l.getOpt("testTarget")?l.getOpt("target"):l.getOpt("testTarget")),"function"==typeof r)return r(t);var n=r.indexOf("?")<0?"?":"&",a=t.join("&");return r+n+a}},p=function(e){u.stopEvent(e),e.dataTransfer&&e.dataTransfer.items?i(e.dataTransfer.items,e):e.dataTransfer&&e.dataTransfer.files&&i(e.dataTransfer.files,e)},f=function(e){e.preventDefault()},c=function(e,t){var r=0,n=l.getOpt(["maxFiles","minFileSize","maxFileSize","maxFilesErrorCallback","minFileSizeErrorCallback","maxFileSizeErrorCallback","fileType","fileTypeErrorCallback"]);if("undefined"!=typeof n.maxFiles&&n.maxFiles<e.length+l.files.length){if(1!==n.maxFiles||1!==l.files.length||1!==e.length)return n.maxFilesErrorCallback(e,r++),!1;l.removeFile(l.files[0])}var a=[],i=[],o=e.length,p=function(){if(!--o){if(!a.length&&!i.length)return;window.setTimeout(function(){l.fire("filesAdded",a,i)},0)}};u.each(e,function(e){function o(r){l.getFromUniqueIdentifier(r)?i.push(e):!function(){e.uniqueIdentifier=r;var n=new s(l,e,r);l.files.push(n),a.push(n),n.container="undefined"!=typeof t?t.srcElement:null,window.setTimeout(function(){l.fire("fileAdded",n,t)},0)}(),p()}var f=e.name;if(n.fileType.length>0){var c=!1;for(var d in n.fileType){var h="."+n.fileType[d];if(f.toLowerCase().indexOf(h.toLowerCase(),f.length-h.length)!==-1){c=!0;break}}if(!c)return n.fileTypeErrorCallback(e,r++),!1}if("undefined"!=typeof n.minFileSize&&e.size<n.minFileSize)return n.minFileSizeErrorCallback(e,r++),!1;if("undefined"!=typeof n.maxFileSize&&e.size>n.maxFileSize)return n.maxFileSizeErrorCallback(e,r++),!1;var m=u.generateUniqueIdentifier(e,t);m&&"function"==typeof m.then?m.then(function(e){o(e)},function(){p()}):o(m)})};return l.uploadNextChunk=function(){var e=!1;if(l.getOpt("prioritizeFirstAndLastChunk")&&(u.each(l.files,function(t){return t.chunks.length&&"pending"==t.chunks[0].status()&&0===t.chunks[0].preprocessState?(t.chunks[0].send(),e=!0,!1):t.chunks.length>1&&"pending"==t.chunks[t.chunks.length-1].status()&&0===t.chunks[t.chunks.length-1].preprocessState?(t.chunks[t.chunks.length-1].send(),e=!0,!1):void 0}),e))return!0;if(u.each(l.files,function(t){if(t.isPaused()===!1&&u.each(t.chunks,function(t){if("pending"==t.status()&&0===t.preprocessState)return t.send(),e=!0,!1}),e)return!1}),e)return!0;var t=!1;return u.each(l.files,function(e){if(!e.isComplete())return t=!0,!1}),t||l.fire("complete"),!1},l.assignBrowse=function(e,t){"undefined"==typeof e.length&&(e=[e]),u.each(e,function(e){var r;"INPUT"===e.tagName&&"file"===e.type?r=e:(r=document.createElement("input"),r.setAttribute("type","file"),r.style.display="none",e.addEventListener("click",function(){r.style.opacity=0,r.style.display="block",r.focus(),r.click(),r.style.display="none"},!1),e.appendChild(r));var n=l.getOpt("maxFiles");"undefined"==typeof n||1!=n?r.setAttribute("multiple","multiple"):r.removeAttribute("multiple"),t?r.setAttribute("webkitdirectory","webkitdirectory"):r.removeAttribute("webkitdirectory");var a=l.getOpt("fileType");"undefined"!=typeof a&&a.length>=1?r.setAttribute("accept",a.map(function(e){return"."+e}).join(",")):r.removeAttribute("accept"),r.addEventListener("change",function(e){c(e.target.files,e);var t=l.getOpt("clearInput");t&&(e.target.value="")},!1)})},l.assignDrop=function(e){"undefined"==typeof e.length&&(e=[e]),u.each(e,function(e){e.addEventListener("dragover",f,!1),e.addEventListener("dragenter",f,!1),e.addEventListener("drop",p,!1)})},l.unAssignDrop=function(e){"undefined"==typeof e.length&&(e=[e]),u.each(e,function(e){e.removeEventListener("dragover",f),e.removeEventListener("dragenter",f),e.removeEventListener("drop",p)})},l.isUploading=function(){var e=!1;return u.each(l.files,function(t){if(t.isUploading())return e=!0,!1}),e},l.upload=function(){if(!l.isUploading()){l.fire("uploadStart");for(var e=1;e<=l.getOpt("simultaneousUploads");e++)l.uploadNextChunk()}},l.pause=function(){u.each(l.files,function(e){e.abort()}),l.fire("pause")},l.cancel=function(){l.fire("beforeCancel");for(var e=l.files.length-1;e>=0;e--)l.files[e].cancel();l.fire("cancel")},l.progress=function(){var e=0,t=0;return u.each(l.files,function(r){e+=r.progress()*r.size,t+=r.size}),t>0?e/t:0},l.addFile=function(e,t){c([e],t)},l.addFiles=function(e,t){c(e,t)},l.removeFile=function(e){for(var t=l.files.length-1;t>=0;t--)l.files[t]===e&&l.files.splice(t,1)},l.getFromUniqueIdentifier=function(e){var t=!1;return u.each(l.files,function(r){r.uniqueIdentifier==e&&(t=r)}),t},l.getSize=function(){var e=0;return u.each(l.files,function(t){e+=t.size}),e},l.handleDropEvent=function(e){p(e)},l.handleChangeEvent=function(e){c(e.target.files,e),e.target.value=""},l.updateQuery=function(e){l.opts.query=e},this};e.exports=t}()},function(e,t){!function(){e.exports=this.React}()}]);
+this["dash_resumable_upload"] =
+/******/ (function(modules) { // webpackBootstrap
+/******/ 	// The module cache
+/******/ 	var installedModules = {};
+/******/
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/
+/******/ 		// Check if module is in cache
+/******/ 		if(installedModules[moduleId])
+/******/ 			return installedModules[moduleId].exports;
+/******/
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = installedModules[moduleId] = {
+/******/ 			exports: {},
+/******/ 			id: moduleId,
+/******/ 			loaded: false
+/******/ 		};
+/******/
+/******/ 		// Execute the module function
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/
+/******/ 		// Flag the module as loaded
+/******/ 		module.loaded = true;
+/******/
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/
+/******/
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = modules;
+/******/
+/******/ 	// expose the module cache
+/******/ 	__webpack_require__.c = installedModules;
+/******/
+/******/ 	// __webpack_public_path__
+/******/ 	__webpack_require__.p = "/lib/";
+/******/
+/******/ 	// Load entry module and return exports
+/******/ 	return __webpack_require__(0);
+/******/ })
+/************************************************************************/
+/******/ ([
+/* 0 */
+/*!******************!*\
+  !*** ./index.js ***!
+  \******************/
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.Upload = undefined;
+	
+	var _Upload = __webpack_require__(/*! ./components/Upload.react */ 1);
+	
+	var Upload = _interopRequireDefault(_Upload).default;
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	exports.Upload = Upload; /* eslint-disable import/prefer-default-export */
+
+/***/ }),
+/* 1 */
+/*!************************************!*\
+  !*** ./components/Upload.react.js ***!
+  \************************************/
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _react = __webpack_require__(/*! react */ 2);
+	
+	var React = _interopRequireDefault(_react).default;
+	
+	var Component = _react.Component;
+	
+	var _propTypes = __webpack_require__(/*! prop-types */ 3);
+	
+	var PropTypes = _interopRequireDefault(_propTypes).default;
+	
+	var _resumablejs = __webpack_require__(/*! resumablejs */ 10);
+	
+	var Resumablejs = _interopRequireDefault(_resumablejs).default;
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var Upload = function (_Component) {
+	  _inherits(Upload, _Component);
+	
+	  function Upload(props) {
+	    _classCallCheck(this, Upload);
+	
+	    var _this = _possibleConstructorReturn(this, (Upload.__proto__ || Object.getPrototypeOf(Upload)).call(this, props));
+	
+	    _this.state = {
+	      progressBar: 0,
+	      messageStatus: "",
+	      fileList: { files: [] },
+	      isPaused: true,
+	      isUploading: false,
+	      isHovered: false,
+	      isComplete: false,
+	      destinationDir: "",
+	      numFiles: 0,
+	      numCompleted: 0
+	    };
+	    _this.toggleHovered = _this.toggleHovered.bind(_this);
+	    _this.cancelUpload = _this.cancelUpload.bind(_this);
+	    _this.pauseUpload = _this.pauseUpload.bind(_this);
+	    _this.startUpload = _this.startUpload.bind(_this);
+	    _this.resumable = null;
+	    return _this;
+	  }
+	
+	  _createClass(Upload, [{
+	    key: "componentDidMount",
+	    value: function componentDidMount() {
+	      var _this2 = this;
+	
+	      var ResumableField = new Resumablejs({
+	        target: this.props.service,
+	        query: {},
+	        fileType: this.props.filetypes,
+	        maxFiles: this.props.maxFiles,
+	        maxFileSize: this.props.maxFileSize,
+	        fileTypeErrorCallback: function fileTypeErrorCallback() {
+	          _this2.setState({
+	            messageStatus: "Invalid file type!"
+	          });
+	        },
+	        testMethod: "post",
+	        testChunks: false,
+	        headers: {},
+	        chunkSize: this.props.chunkSize,
+	        simultaneousUploads: this.props.simultaneousUploads,
+	        forceChunkSize: false
+	      });
+	
+	      ResumableField.assignBrowse(this.uploader);
+	
+	      //Enable or Disable DragAnd Drop
+	      if (this.props.disableDragAndDrop === false) {
+	        ResumableField.assignDrop(this.dropZone);
+	      }
+	
+	      ResumableField.on("fileAdded", function (file) {
+	        _this2.resumable.subject = $("#subject-number").text();
+	        var numFiles = _this2.state.numFiles;
+	        numFiles = numFiles + 1;
+	        _this2.setState({ numFiles: numFiles });
+	        _this2.props.setProps({ numFiles: numFiles });
+	
+	        _this2.setState({
+	          messageStatus: _this2.props.fileAddedMessage || " Files to upload: " + numFiles,
+	          isComplete: false
+	        });
+	
+	        if (typeof _this2.props.onFileAdded === "function") {
+	          _this2.props.onFileAdded(file, _this2.resumable);
+	        } else if (!_this2.state.isPaused) {
+	          ResumableField.upload();
+	        }
+	      });
+	
+	      ResumableField.on("fileSuccess", function (file, fileServer) {
+	        if (_this2.props.fileNameServer) {
+	          var objectServer = JSON.parse(fileServer);
+	          file.fileName = objectServer[_this2.props.fileNameServer];
+	        } else {
+	          file.fileName = fileServer;
+	        }
+	        var currentFiles = _this2.state.fileList.files;
+	        currentFiles.push(file);
+	
+	        var fileNames = _this2.props.fileNames;
+	        fileNames.push(file.fileName);
+	
+	        var numCompleted = _this2.state.numCompleted;
+	        numCompleted = numCompleted + 1;
+	        _this2.setState({ numCompleted: numCompleted });
+	
+	        _this2.props.setProps({
+	          fileNames: fileNames,
+	          lastUploadedFile: file.fileName,
+	          numCompleted: numCompleted
+	        });
+	        _this2.setState({
+	          fileList: { files: currentFiles },
+	          messageStatus: _this2.props.completedMessage + file.fileName || fileServer
+	        }, function () {
+	          if (typeof _this2.props.onFileSuccess === "function") {
+	            _this2.props.onFileSuccess(file, fileServer);
+	          }
+	        });
+	      });
+	
+	      ResumableField.on("fileSuccess", function (file, fileServer) {
+	        if (_this2.props.setProps) {
+	          _this2.props.setProps({
+	            isCompleted: true
+	          });
+	        }
+	        _this2.setState({
+	          isComplete: true,
+	          showEnabledButtons: false
+	        });
+	      });
+	
+	      ResumableField.on("progress", function () {
+	        _this2.setState({
+	          isUploading: ResumableField.isUploading()
+	        });
+	
+	        if (ResumableField.progress() * 100 < 100) {
+	          _this2.setState({
+	            messageStatus: parseInt(ResumableField.progress() * 100, 10) + "%",
+	            progressBar: ResumableField.progress() * 100
+	          });
+	        } else {
+	          setTimeout(function () {
+	            _this2.setState({
+	              progressBar: 0
+	            });
+	          }, 1000);
+	        }
+	      });
+	
+	      ResumableField.on("fileError", function (file, errorCount) {
+	        _this2.props.onUploadErrorCallback(file, errorCount);
+	      });
+	
+	      this.resumable = ResumableField;
+	    }
+	  }, {
+	    key: "cancelUpload",
+	    value: function cancelUpload() {
+	      this.resumable.cancel();
+	
+	      this.setState({
+	        fileList: { files: [] }
+	      });
+	    }
+	  }, {
+	    key: "pauseUpload",
+	    value: function pauseUpload() {
+	      if (!this.state.isPaused) {
+	        this.resumable.pause();
+	        this.setState({
+	          isPaused: true,
+	          isUploading: false
+	        });
+	      } else {
+	        this.resumable.upload();
+	        this.setState({
+	          isPaused: false,
+	          isUploading: this.resumable.isUploading
+	        });
+	      }
+	    }
+	  }, {
+	    key: "startUpload",
+	    value: function startUpload(e) {
+	      e.preventDefault();
+	      this.resumable.pause(false);
+	      this.resumable.upload();
+	      this.setState({
+	        isPaused: false,
+	        isUploading: true
+	      });
+	    }
+	  }, {
+	    key: "toggleHovered",
+	    value: function toggleHovered() {
+	      this.setState({
+	        isHovered: !this.state.isHovered
+	      });
+	    }
+	  }, {
+	    key: "render",
+	    value: function render() {
+	      var _this3 = this;
+	
+	      var fileList = null;
+	
+	      var textLabel = null;
+	      if (this.props.textLabel) {
+	        textLabel = this.props.textLabel;
+	      }
+	
+	      var startButton = null;
+	      if (this.props.startButton) {
+	        if (typeof this.props.startButton === "boolean") startButton = React.createElement(
+	          "label",
+	          null,
+	          React.createElement(
+	            "button",
+	            {
+	              disabled: this.state.isUploading,
+	              className: "resumable-btn-start",
+	              onClick: this.startUpload
+	            },
+	            this.props.startButton && "upload"
+	          )
+	        );else if (typeof this.props.startButton === "string") {
+	          var startButtonOther = $("#" + this.props.startButton);
+	          startButtonOther.click(this.startUpload);
+	        } else startButton = this.props.startButton;
+	      }
+	
+	      var cancelButton = null;
+	      if (this.props.cancelButton) {
+	        if (typeof this.props.cancelButton === "boolean") cancelButton = React.createElement(
+	          "label",
+	          null,
+	          React.createElement(
+	            "button",
+	            {
+	              disabled: !this.state.isUploading,
+	              className: "resumable-btn-cancel",
+	              onClick: this.cancelUpload
+	            },
+	            this.props.cancelButton && "cancel"
+	          )
+	        );else cancelButton = this.props.cancelButton;
+	      }
+	
+	      var pauseButton = null;
+	      if (this.props.pauseButton) {
+	        if (typeof this.props.pauseButton === "string" || typeof this.props.pauseButton === "boolean") pauseButton = React.createElement(
+	          "label",
+	          null,
+	          React.createElement(
+	            "button",
+	            {
+	              disabled: !this.state.isUploading,
+	              className: "resumable-btn-pause",
+	              onClick: this.pauseUpload
+	            },
+	            this.props.pauseButton && (this.state.isPaused ? "resume" : "pause")
+	          )
+	        );else pauseButton = this.props.pauseButton;
+	      }
+	
+	      var getStyle = function getStyle() {
+	        if (_this3.state.isComplete) {
+	          return _this3.props.completeStyle;
+	        } else if (_this3.state.isHovered || _this3.state.isUploading) {
+	          return _this3.props.activeStyle;
+	        } else {
+	          return _this3.props.defaultStyle;
+	        }
+	      };
+	
+	      var getClass = function getClass() {
+	        if (_this3.props.disabledInput) {
+	          return _this3.props.disableClass;
+	        } else if (_this3.state.isHovered) {
+	          return _this3.props.hoveredClass;
+	        } else if (_this3.state.isUploading) {
+	          return _this3.props.uploadingClass;
+	        } else if (_this3.state.isComplete) {
+	          return _this3.props.completeClass;
+	        } else if (_this3.state.isPaused) {
+	          return _this3.props.completeClass;
+	        } else {
+	          return _this3.props.className;
+	        }
+	      };
+	
+	      return React.createElement(
+	        "div",
+	        {
+	          id: this.props.id,
+	          className: getClass(),
+	          ref: function ref(node) {
+	            return _this3.dropZone = node;
+	          }
+	        },
+	        React.createElement(
+	          "label",
+	          {
+	            style: getStyle(),
+	            onMouseEnter: this.toggleHovered,
+	            onMouseLeave: this.toggleHovered
+	          },
+	          this.state.messageStatus == "" ? textLabel : this.state.messageStatus,
+	          React.createElement("input", {
+	            ref: function ref(node) {
+	              return _this3.uploader = node;
+	            },
+	            type: "file",
+	            className: "btn",
+	            name: this.props.id + "-upload",
+	            accept: this.props.fileAccept || "*",
+	            disabled: this.props.disableInput || false,
+	            style: {
+	              opacity: "0",
+	              width: "0.1px%",
+	              height: "0.1px%",
+	              position: "absolute",
+	              overflow: "hidden",
+	              "z-index": "-1"
+	            }
+	          })
+	        ),
+	        React.createElement(
+	          "div",
+	          {
+	            className: "progress",
+	            style: {
+	              display: this.state.progressBar === 0 ? "none" : "block"
+	            }
+	          },
+	          React.createElement("div", {
+	            className: "progress-bar",
+	            style: {
+	              width: this.state.progressBar + "%",
+	              height: "100%"
+	            }
+	          })
+	        ),
+	        fileList,
+	        startButton,
+	        pauseButton,
+	        cancelButton
+	      );
+	    }
+	  }]);
+	
+	  return Upload;
+	}(Component);
+	
+	exports.default = Upload;
+	
+	
+	Upload.propTypes = {
+	  /**
+	   * Maximum number of files that can be uploaded in one session
+	   */
+	  maxFiles: PropTypes.number,
+	
+	  /**
+	   * Maximum size per file in bytes.
+	   */
+	  maxFileSize: PropTypes.number,
+	
+	  /**
+	   * Size of file chunks to send to server.
+	   */
+	  chunkSize: PropTypes.number,
+	
+	  /**
+	   * Number of simultaneous uploads to select
+	   */
+	  simultaneousUploads: PropTypes.number,
+	
+	  /**
+	   * The service to send the files to
+	   */
+	  service: PropTypes.string,
+	
+	  /**
+	   * Class to add to the upload component by default
+	   */
+	  className: PropTypes.string,
+	
+	  /**
+	   * Class to add to the upload component when it is hovered
+	   */
+	  hoveredClass: PropTypes.string,
+	
+	  /**
+	   * Class to add to the upload component when it is disabled
+	   */
+	  disabledClass: PropTypes.string,
+	
+	  /**
+	   * Class to add to the upload component when it is paused
+	   */
+	  pausedClass: PropTypes.string,
+	
+	  /**
+	   * Class to add to the upload component when it is complete
+	   */
+	  completeClass: PropTypes.string,
+	
+	  /**
+	   * Class to add to the upload component when it is uploading
+	   */
+	  uploadingClass: PropTypes.string,
+	
+	  /**
+	   * Style attributes to add to the upload component
+	   */
+	  defaultStyle: PropTypes.object,
+	
+	  /**
+	   * Style when upload component is hovered over
+	   */
+	  activeStyle: PropTypes.object,
+	
+	  /**
+	   * Style when upload is completed (upload finished)
+	   */
+	  completeStyle: PropTypes.object,
+	
+	  /**
+	   * The string to display in the upload component
+	   */
+	  textLabel: PropTypes.string,
+	
+	  /**
+	   * Message to display when upload completed
+	   */
+	  completedMessage: PropTypes.string,
+	
+	  /**
+	   * The names of the files uploaded
+	   */
+	  fileNames: PropTypes.arrayOf(PropTypes.string),
+	
+	  /**
+	   * List of allowed file types, e.g. ['jpg', 'png']
+	   */
+	  filetypes: PropTypes.arrayOf(PropTypes.string),
+	
+	  /**
+	   * Whether or not to have a start button
+	   */
+	  startButton: PropTypes.bool,
+	
+	  /**
+	   * Whether or not to have a pause button
+	   */
+	  pauseButton: PropTypes.bool,
+	
+	  /**
+	   * Whether or not to have a cancel button
+	   */
+	  cancelButton: PropTypes.bool,
+	
+	  /**
+	   * Whether or not to allow file drag and drop
+	   */
+	  disableDragAndDrop: PropTypes.bool,
+	
+	  /**
+	   * Dash-supplied function for updating props
+	   */
+	  setProps: PropTypes.func,
+	
+	  /**
+	   * User supplied id of this component
+	   */
+	  id: PropTypes.string,
+	
+	  isPaused: PropTypes.bool,
+	
+	  numFiles: PropTypes.number,
+	
+	  numCompleted: PropTypes.number,
+	
+	  lastUploadedFile: PropTypes.string
+	};
+	
+	Upload.defaultProps = {
+	  maxFiles: 1,
+	  maxFileSize: 1024 * 1024 * 10,
+	  chunkSize: 1024 * 1024,
+	  simultaneuosUploads: 1,
+	  service: "/upload",
+	  className: "resumable-default",
+	  hoveredClass: "resumable-hovered",
+	  completeClass: "resumable-complete",
+	  disabledClass: "resumable-disabled",
+	  pausedClass: "resumable-paused",
+	  uploadingClass: "resumable-uploading",
+	  defaultStyle: {},
+	  activeStyle: {},
+	  completeStyle: {},
+	  textLabel: "Click Here to Select a File",
+	  completedMessage: "Complete! ",
+	  fileNames: [],
+	  filetypes: undefined,
+	  startButton: true,
+	  pauseButton: true,
+	  cancelButton: true,
+	  disableDragAndDrop: false,
+	  id: "default-uploader-id",
+	  isPaused: true,
+	  numFiles: 0,
+	  numCompleted: 0,
+	  lastUploadedFile: ""
+	};
+
+/***/ }),
+/* 2 */
+/*!************************!*\
+  !*** external "React" ***!
+  \************************/
+/***/ (function(module, exports) {
+
+	(function() { module.exports = this["React"]; }());
+
+/***/ }),
+/* 3 */
+/*!********************************!*\
+  !*** ../~/prop-types/index.js ***!
+  \********************************/
+/***/ (function(module, exports, __webpack_require__) {
+
+	/**
+	 * Copyright (c) 2013-present, Facebook, Inc.
+	 *
+	 * This source code is licensed under the MIT license found in the
+	 * LICENSE file in the root directory of this source tree.
+	 */
+	
+	if (true) {
+	  var ReactIs = __webpack_require__(/*! react-is */ 4);
+	
+	  // By explicitly using `prop-types` you are opting into new development behavior.
+	  // http://fb.me/prop-types-in-prod
+	  var throwOnDirectAccess = true;
+	  module.exports = __webpack_require__(/*! ./factoryWithTypeCheckers */ 6)(ReactIs.isElement, throwOnDirectAccess);
+	} else {
+	  // By explicitly using `prop-types` you are opting into new production behavior.
+	  // http://fb.me/prop-types-in-prod
+	  module.exports = require('./factoryWithThrowingShims')();
+	}
+
+
+/***/ }),
+/* 4 */
+/*!******************************!*\
+  !*** ../~/react-is/index.js ***!
+  \******************************/
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	if (false) {
+	  module.exports = require('./cjs/react-is.production.min.js');
+	} else {
+	  module.exports = __webpack_require__(/*! ./cjs/react-is.development.js */ 5);
+	}
+
+
+/***/ }),
+/* 5 */
+/*!*************************************************!*\
+  !*** ../~/react-is/cjs/react-is.development.js ***!
+  \*************************************************/
+/***/ (function(module, exports, __webpack_require__) {
+
+	/** @license React v16.8.6
+	 * react-is.development.js
+	 *
+	 * Copyright (c) Facebook, Inc. and its affiliates.
+	 *
+	 * This source code is licensed under the MIT license found in the
+	 * LICENSE file in the root directory of this source tree.
+	 */
+	
+	'use strict';
+	
+	
+	
+	if (true) {
+	  (function() {
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', { value: true });
+	
+	// The Symbol used to tag the ReactElement-like types. If there is no native Symbol
+	// nor polyfill, then a plain number is used for performance.
+	var hasSymbol = typeof Symbol === 'function' && Symbol.for;
+	
+	var REACT_ELEMENT_TYPE = hasSymbol ? Symbol.for('react.element') : 0xeac7;
+	var REACT_PORTAL_TYPE = hasSymbol ? Symbol.for('react.portal') : 0xeaca;
+	var REACT_FRAGMENT_TYPE = hasSymbol ? Symbol.for('react.fragment') : 0xeacb;
+	var REACT_STRICT_MODE_TYPE = hasSymbol ? Symbol.for('react.strict_mode') : 0xeacc;
+	var REACT_PROFILER_TYPE = hasSymbol ? Symbol.for('react.profiler') : 0xead2;
+	var REACT_PROVIDER_TYPE = hasSymbol ? Symbol.for('react.provider') : 0xeacd;
+	var REACT_CONTEXT_TYPE = hasSymbol ? Symbol.for('react.context') : 0xeace;
+	var REACT_ASYNC_MODE_TYPE = hasSymbol ? Symbol.for('react.async_mode') : 0xeacf;
+	var REACT_CONCURRENT_MODE_TYPE = hasSymbol ? Symbol.for('react.concurrent_mode') : 0xeacf;
+	var REACT_FORWARD_REF_TYPE = hasSymbol ? Symbol.for('react.forward_ref') : 0xead0;
+	var REACT_SUSPENSE_TYPE = hasSymbol ? Symbol.for('react.suspense') : 0xead1;
+	var REACT_MEMO_TYPE = hasSymbol ? Symbol.for('react.memo') : 0xead3;
+	var REACT_LAZY_TYPE = hasSymbol ? Symbol.for('react.lazy') : 0xead4;
+	
+	function isValidElementType(type) {
+	  return typeof type === 'string' || typeof type === 'function' ||
+	  // Note: its typeof might be other than 'symbol' or 'number' if it's a polyfill.
+	  type === REACT_FRAGMENT_TYPE || type === REACT_CONCURRENT_MODE_TYPE || type === REACT_PROFILER_TYPE || type === REACT_STRICT_MODE_TYPE || type === REACT_SUSPENSE_TYPE || typeof type === 'object' && type !== null && (type.$$typeof === REACT_LAZY_TYPE || type.$$typeof === REACT_MEMO_TYPE || type.$$typeof === REACT_PROVIDER_TYPE || type.$$typeof === REACT_CONTEXT_TYPE || type.$$typeof === REACT_FORWARD_REF_TYPE);
+	}
+	
+	/**
+	 * Forked from fbjs/warning:
+	 * https://github.com/facebook/fbjs/blob/e66ba20ad5be433eb54423f2b097d829324d9de6/packages/fbjs/src/__forks__/warning.js
+	 *
+	 * Only change is we use console.warn instead of console.error,
+	 * and do nothing when 'console' is not supported.
+	 * This really simplifies the code.
+	 * ---
+	 * Similar to invariant but only logs a warning if the condition is not met.
+	 * This can be used to log issues in development environments in critical
+	 * paths. Removing the logging code for production environments will keep the
+	 * same logic and follow the same code paths.
+	 */
+	
+	var lowPriorityWarning = function () {};
+	
+	{
+	  var printWarning = function (format) {
+	    for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+	      args[_key - 1] = arguments[_key];
+	    }
+	
+	    var argIndex = 0;
+	    var message = 'Warning: ' + format.replace(/%s/g, function () {
+	      return args[argIndex++];
+	    });
+	    if (typeof console !== 'undefined') {
+	      console.warn(message);
+	    }
+	    try {
+	      // --- Welcome to debugging React ---
+	      // This error was thrown as a convenience so that you can use this stack
+	      // to find the callsite that caused this warning to fire.
+	      throw new Error(message);
+	    } catch (x) {}
+	  };
+	
+	  lowPriorityWarning = function (condition, format) {
+	    if (format === undefined) {
+	      throw new Error('`lowPriorityWarning(condition, format, ...args)` requires a warning ' + 'message argument');
+	    }
+	    if (!condition) {
+	      for (var _len2 = arguments.length, args = Array(_len2 > 2 ? _len2 - 2 : 0), _key2 = 2; _key2 < _len2; _key2++) {
+	        args[_key2 - 2] = arguments[_key2];
+	      }
+	
+	      printWarning.apply(undefined, [format].concat(args));
+	    }
+	  };
+	}
+	
+	var lowPriorityWarning$1 = lowPriorityWarning;
+	
+	function typeOf(object) {
+	  if (typeof object === 'object' && object !== null) {
+	    var $$typeof = object.$$typeof;
+	    switch ($$typeof) {
+	      case REACT_ELEMENT_TYPE:
+	        var type = object.type;
+	
+	        switch (type) {
+	          case REACT_ASYNC_MODE_TYPE:
+	          case REACT_CONCURRENT_MODE_TYPE:
+	          case REACT_FRAGMENT_TYPE:
+	          case REACT_PROFILER_TYPE:
+	          case REACT_STRICT_MODE_TYPE:
+	          case REACT_SUSPENSE_TYPE:
+	            return type;
+	          default:
+	            var $$typeofType = type && type.$$typeof;
+	
+	            switch ($$typeofType) {
+	              case REACT_CONTEXT_TYPE:
+	              case REACT_FORWARD_REF_TYPE:
+	              case REACT_PROVIDER_TYPE:
+	                return $$typeofType;
+	              default:
+	                return $$typeof;
+	            }
+	        }
+	      case REACT_LAZY_TYPE:
+	      case REACT_MEMO_TYPE:
+	      case REACT_PORTAL_TYPE:
+	        return $$typeof;
+	    }
+	  }
+	
+	  return undefined;
+	}
+	
+	// AsyncMode is deprecated along with isAsyncMode
+	var AsyncMode = REACT_ASYNC_MODE_TYPE;
+	var ConcurrentMode = REACT_CONCURRENT_MODE_TYPE;
+	var ContextConsumer = REACT_CONTEXT_TYPE;
+	var ContextProvider = REACT_PROVIDER_TYPE;
+	var Element = REACT_ELEMENT_TYPE;
+	var ForwardRef = REACT_FORWARD_REF_TYPE;
+	var Fragment = REACT_FRAGMENT_TYPE;
+	var Lazy = REACT_LAZY_TYPE;
+	var Memo = REACT_MEMO_TYPE;
+	var Portal = REACT_PORTAL_TYPE;
+	var Profiler = REACT_PROFILER_TYPE;
+	var StrictMode = REACT_STRICT_MODE_TYPE;
+	var Suspense = REACT_SUSPENSE_TYPE;
+	
+	var hasWarnedAboutDeprecatedIsAsyncMode = false;
+	
+	// AsyncMode should be deprecated
+	function isAsyncMode(object) {
+	  {
+	    if (!hasWarnedAboutDeprecatedIsAsyncMode) {
+	      hasWarnedAboutDeprecatedIsAsyncMode = true;
+	      lowPriorityWarning$1(false, 'The ReactIs.isAsyncMode() alias has been deprecated, ' + 'and will be removed in React 17+. Update your code to use ' + 'ReactIs.isConcurrentMode() instead. It has the exact same API.');
+	    }
+	  }
+	  return isConcurrentMode(object) || typeOf(object) === REACT_ASYNC_MODE_TYPE;
+	}
+	function isConcurrentMode(object) {
+	  return typeOf(object) === REACT_CONCURRENT_MODE_TYPE;
+	}
+	function isContextConsumer(object) {
+	  return typeOf(object) === REACT_CONTEXT_TYPE;
+	}
+	function isContextProvider(object) {
+	  return typeOf(object) === REACT_PROVIDER_TYPE;
+	}
+	function isElement(object) {
+	  return typeof object === 'object' && object !== null && object.$$typeof === REACT_ELEMENT_TYPE;
+	}
+	function isForwardRef(object) {
+	  return typeOf(object) === REACT_FORWARD_REF_TYPE;
+	}
+	function isFragment(object) {
+	  return typeOf(object) === REACT_FRAGMENT_TYPE;
+	}
+	function isLazy(object) {
+	  return typeOf(object) === REACT_LAZY_TYPE;
+	}
+	function isMemo(object) {
+	  return typeOf(object) === REACT_MEMO_TYPE;
+	}
+	function isPortal(object) {
+	  return typeOf(object) === REACT_PORTAL_TYPE;
+	}
+	function isProfiler(object) {
+	  return typeOf(object) === REACT_PROFILER_TYPE;
+	}
+	function isStrictMode(object) {
+	  return typeOf(object) === REACT_STRICT_MODE_TYPE;
+	}
+	function isSuspense(object) {
+	  return typeOf(object) === REACT_SUSPENSE_TYPE;
+	}
+	
+	exports.typeOf = typeOf;
+	exports.AsyncMode = AsyncMode;
+	exports.ConcurrentMode = ConcurrentMode;
+	exports.ContextConsumer = ContextConsumer;
+	exports.ContextProvider = ContextProvider;
+	exports.Element = Element;
+	exports.ForwardRef = ForwardRef;
+	exports.Fragment = Fragment;
+	exports.Lazy = Lazy;
+	exports.Memo = Memo;
+	exports.Portal = Portal;
+	exports.Profiler = Profiler;
+	exports.StrictMode = StrictMode;
+	exports.Suspense = Suspense;
+	exports.isValidElementType = isValidElementType;
+	exports.isAsyncMode = isAsyncMode;
+	exports.isConcurrentMode = isConcurrentMode;
+	exports.isContextConsumer = isContextConsumer;
+	exports.isContextProvider = isContextProvider;
+	exports.isElement = isElement;
+	exports.isForwardRef = isForwardRef;
+	exports.isFragment = isFragment;
+	exports.isLazy = isLazy;
+	exports.isMemo = isMemo;
+	exports.isPortal = isPortal;
+	exports.isProfiler = isProfiler;
+	exports.isStrictMode = isStrictMode;
+	exports.isSuspense = isSuspense;
+	  })();
+	}
+
+
+/***/ }),
+/* 6 */
+/*!**************************************************!*\
+  !*** ../~/prop-types/factoryWithTypeCheckers.js ***!
+  \**************************************************/
+/***/ (function(module, exports, __webpack_require__) {
+
+	/**
+	 * Copyright (c) 2013-present, Facebook, Inc.
+	 *
+	 * This source code is licensed under the MIT license found in the
+	 * LICENSE file in the root directory of this source tree.
+	 */
+	
+	'use strict';
+	
+	var ReactIs = __webpack_require__(/*! react-is */ 4);
+	var assign = __webpack_require__(/*! object-assign */ 7);
+	
+	var ReactPropTypesSecret = __webpack_require__(/*! ./lib/ReactPropTypesSecret */ 8);
+	var checkPropTypes = __webpack_require__(/*! ./checkPropTypes */ 9);
+	
+	var has = Function.call.bind(Object.prototype.hasOwnProperty);
+	var printWarning = function() {};
+	
+	if (true) {
+	  printWarning = function(text) {
+	    var message = 'Warning: ' + text;
+	    if (typeof console !== 'undefined') {
+	      console.error(message);
+	    }
+	    try {
+	      // --- Welcome to debugging React ---
+	      // This error was thrown as a convenience so that you can use this stack
+	      // to find the callsite that caused this warning to fire.
+	      throw new Error(message);
+	    } catch (x) {}
+	  };
+	}
+	
+	function emptyFunctionThatReturnsNull() {
+	  return null;
+	}
+	
+	module.exports = function(isValidElement, throwOnDirectAccess) {
+	  /* global Symbol */
+	  var ITERATOR_SYMBOL = typeof Symbol === 'function' && Symbol.iterator;
+	  var FAUX_ITERATOR_SYMBOL = '@@iterator'; // Before Symbol spec.
+	
+	  /**
+	   * Returns the iterator method function contained on the iterable object.
+	   *
+	   * Be sure to invoke the function with the iterable as context:
+	   *
+	   *     var iteratorFn = getIteratorFn(myIterable);
+	   *     if (iteratorFn) {
+	   *       var iterator = iteratorFn.call(myIterable);
+	   *       ...
+	   *     }
+	   *
+	   * @param {?object} maybeIterable
+	   * @return {?function}
+	   */
+	  function getIteratorFn(maybeIterable) {
+	    var iteratorFn = maybeIterable && (ITERATOR_SYMBOL && maybeIterable[ITERATOR_SYMBOL] || maybeIterable[FAUX_ITERATOR_SYMBOL]);
+	    if (typeof iteratorFn === 'function') {
+	      return iteratorFn;
+	    }
+	  }
+	
+	  /**
+	   * Collection of methods that allow declaration and validation of props that are
+	   * supplied to React components. Example usage:
+	   *
+	   *   var Props = require('ReactPropTypes');
+	   *   var MyArticle = React.createClass({
+	   *     propTypes: {
+	   *       // An optional string prop named "description".
+	   *       description: Props.string,
+	   *
+	   *       // A required enum prop named "category".
+	   *       category: Props.oneOf(['News','Photos']).isRequired,
+	   *
+	   *       // A prop named "dialog" that requires an instance of Dialog.
+	   *       dialog: Props.instanceOf(Dialog).isRequired
+	   *     },
+	   *     render: function() { ... }
+	   *   });
+	   *
+	   * A more formal specification of how these methods are used:
+	   *
+	   *   type := array|bool|func|object|number|string|oneOf([...])|instanceOf(...)
+	   *   decl := ReactPropTypes.{type}(.isRequired)?
+	   *
+	   * Each and every declaration produces a function with the same signature. This
+	   * allows the creation of custom validation functions. For example:
+	   *
+	   *  var MyLink = React.createClass({
+	   *    propTypes: {
+	   *      // An optional string or URI prop named "href".
+	   *      href: function(props, propName, componentName) {
+	   *        var propValue = props[propName];
+	   *        if (propValue != null && typeof propValue !== 'string' &&
+	   *            !(propValue instanceof URI)) {
+	   *          return new Error(
+	   *            'Expected a string or an URI for ' + propName + ' in ' +
+	   *            componentName
+	   *          );
+	   *        }
+	   *      }
+	   *    },
+	   *    render: function() {...}
+	   *  });
+	   *
+	   * @internal
+	   */
+	
+	  var ANONYMOUS = '<<anonymous>>';
+	
+	  // Important!
+	  // Keep this list in sync with production version in `./factoryWithThrowingShims.js`.
+	  var ReactPropTypes = {
+	    array: createPrimitiveTypeChecker('array'),
+	    bool: createPrimitiveTypeChecker('boolean'),
+	    func: createPrimitiveTypeChecker('function'),
+	    number: createPrimitiveTypeChecker('number'),
+	    object: createPrimitiveTypeChecker('object'),
+	    string: createPrimitiveTypeChecker('string'),
+	    symbol: createPrimitiveTypeChecker('symbol'),
+	
+	    any: createAnyTypeChecker(),
+	    arrayOf: createArrayOfTypeChecker,
+	    element: createElementTypeChecker(),
+	    elementType: createElementTypeTypeChecker(),
+	    instanceOf: createInstanceTypeChecker,
+	    node: createNodeChecker(),
+	    objectOf: createObjectOfTypeChecker,
+	    oneOf: createEnumTypeChecker,
+	    oneOfType: createUnionTypeChecker,
+	    shape: createShapeTypeChecker,
+	    exact: createStrictShapeTypeChecker,
+	  };
+	
+	  /**
+	   * inlined Object.is polyfill to avoid requiring consumers ship their own
+	   * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/is
+	   */
+	  /*eslint-disable no-self-compare*/
+	  function is(x, y) {
+	    // SameValue algorithm
+	    if (x === y) {
+	      // Steps 1-5, 7-10
+	      // Steps 6.b-6.e: +0 != -0
+	      return x !== 0 || 1 / x === 1 / y;
+	    } else {
+	      // Step 6.a: NaN == NaN
+	      return x !== x && y !== y;
+	    }
+	  }
+	  /*eslint-enable no-self-compare*/
+	
+	  /**
+	   * We use an Error-like object for backward compatibility as people may call
+	   * PropTypes directly and inspect their output. However, we don't use real
+	   * Errors anymore. We don't inspect their stack anyway, and creating them
+	   * is prohibitively expensive if they are created too often, such as what
+	   * happens in oneOfType() for any type before the one that matched.
+	   */
+	  function PropTypeError(message) {
+	    this.message = message;
+	    this.stack = '';
+	  }
+	  // Make `instanceof Error` still work for returned errors.
+	  PropTypeError.prototype = Error.prototype;
+	
+	  function createChainableTypeChecker(validate) {
+	    if (true) {
+	      var manualPropTypeCallCache = {};
+	      var manualPropTypeWarningCount = 0;
+	    }
+	    function checkType(isRequired, props, propName, componentName, location, propFullName, secret) {
+	      componentName = componentName || ANONYMOUS;
+	      propFullName = propFullName || propName;
+	
+	      if (secret !== ReactPropTypesSecret) {
+	        if (throwOnDirectAccess) {
+	          // New behavior only for users of `prop-types` package
+	          var err = new Error(
+	            'Calling PropTypes validators directly is not supported by the `prop-types` package. ' +
+	            'Use `PropTypes.checkPropTypes()` to call them. ' +
+	            'Read more at http://fb.me/use-check-prop-types'
+	          );
+	          err.name = 'Invariant Violation';
+	          throw err;
+	        } else if (("development") !== 'production' && typeof console !== 'undefined') {
+	          // Old behavior for people using React.PropTypes
+	          var cacheKey = componentName + ':' + propName;
+	          if (
+	            !manualPropTypeCallCache[cacheKey] &&
+	            // Avoid spamming the console because they are often not actionable except for lib authors
+	            manualPropTypeWarningCount < 3
+	          ) {
+	            printWarning(
+	              'You are manually calling a React.PropTypes validation ' +
+	              'function for the `' + propFullName + '` prop on `' + componentName  + '`. This is deprecated ' +
+	              'and will throw in the standalone `prop-types` package. ' +
+	              'You may be seeing this warning due to a third-party PropTypes ' +
+	              'library. See https://fb.me/react-warning-dont-call-proptypes ' + 'for details.'
+	            );
+	            manualPropTypeCallCache[cacheKey] = true;
+	            manualPropTypeWarningCount++;
+	          }
+	        }
+	      }
+	      if (props[propName] == null) {
+	        if (isRequired) {
+	          if (props[propName] === null) {
+	            return new PropTypeError('The ' + location + ' `' + propFullName + '` is marked as required ' + ('in `' + componentName + '`, but its value is `null`.'));
+	          }
+	          return new PropTypeError('The ' + location + ' `' + propFullName + '` is marked as required in ' + ('`' + componentName + '`, but its value is `undefined`.'));
+	        }
+	        return null;
+	      } else {
+	        return validate(props, propName, componentName, location, propFullName);
+	      }
+	    }
+	
+	    var chainedCheckType = checkType.bind(null, false);
+	    chainedCheckType.isRequired = checkType.bind(null, true);
+	
+	    return chainedCheckType;
+	  }
+	
+	  function createPrimitiveTypeChecker(expectedType) {
+	    function validate(props, propName, componentName, location, propFullName, secret) {
+	      var propValue = props[propName];
+	      var propType = getPropType(propValue);
+	      if (propType !== expectedType) {
+	        // `propValue` being instance of, say, date/regexp, pass the 'object'
+	        // check, but we can offer a more precise error message here rather than
+	        // 'of type `object`'.
+	        var preciseType = getPreciseType(propValue);
+	
+	        return new PropTypeError('Invalid ' + location + ' `' + propFullName + '` of type ' + ('`' + preciseType + '` supplied to `' + componentName + '`, expected ') + ('`' + expectedType + '`.'));
+	      }
+	      return null;
+	    }
+	    return createChainableTypeChecker(validate);
+	  }
+	
+	  function createAnyTypeChecker() {
+	    return createChainableTypeChecker(emptyFunctionThatReturnsNull);
+	  }
+	
+	  function createArrayOfTypeChecker(typeChecker) {
+	    function validate(props, propName, componentName, location, propFullName) {
+	      if (typeof typeChecker !== 'function') {
+	        return new PropTypeError('Property `' + propFullName + '` of component `' + componentName + '` has invalid PropType notation inside arrayOf.');
+	      }
+	      var propValue = props[propName];
+	      if (!Array.isArray(propValue)) {
+	        var propType = getPropType(propValue);
+	        return new PropTypeError('Invalid ' + location + ' `' + propFullName + '` of type ' + ('`' + propType + '` supplied to `' + componentName + '`, expected an array.'));
+	      }
+	      for (var i = 0; i < propValue.length; i++) {
+	        var error = typeChecker(propValue, i, componentName, location, propFullName + '[' + i + ']', ReactPropTypesSecret);
+	        if (error instanceof Error) {
+	          return error;
+	        }
+	      }
+	      return null;
+	    }
+	    return createChainableTypeChecker(validate);
+	  }
+	
+	  function createElementTypeChecker() {
+	    function validate(props, propName, componentName, location, propFullName) {
+	      var propValue = props[propName];
+	      if (!isValidElement(propValue)) {
+	        var propType = getPropType(propValue);
+	        return new PropTypeError('Invalid ' + location + ' `' + propFullName + '` of type ' + ('`' + propType + '` supplied to `' + componentName + '`, expected a single ReactElement.'));
+	      }
+	      return null;
+	    }
+	    return createChainableTypeChecker(validate);
+	  }
+	
+	  function createElementTypeTypeChecker() {
+	    function validate(props, propName, componentName, location, propFullName) {
+	      var propValue = props[propName];
+	      if (!ReactIs.isValidElementType(propValue)) {
+	        var propType = getPropType(propValue);
+	        return new PropTypeError('Invalid ' + location + ' `' + propFullName + '` of type ' + ('`' + propType + '` supplied to `' + componentName + '`, expected a single ReactElement type.'));
+	      }
+	      return null;
+	    }
+	    return createChainableTypeChecker(validate);
+	  }
+	
+	  function createInstanceTypeChecker(expectedClass) {
+	    function validate(props, propName, componentName, location, propFullName) {
+	      if (!(props[propName] instanceof expectedClass)) {
+	        var expectedClassName = expectedClass.name || ANONYMOUS;
+	        var actualClassName = getClassName(props[propName]);
+	        return new PropTypeError('Invalid ' + location + ' `' + propFullName + '` of type ' + ('`' + actualClassName + '` supplied to `' + componentName + '`, expected ') + ('instance of `' + expectedClassName + '`.'));
+	      }
+	      return null;
+	    }
+	    return createChainableTypeChecker(validate);
+	  }
+	
+	  function createEnumTypeChecker(expectedValues) {
+	    if (!Array.isArray(expectedValues)) {
+	      if (true) {
+	        if (arguments.length > 1) {
+	          printWarning(
+	            'Invalid arguments supplied to oneOf, expected an array, got ' + arguments.length + ' arguments. ' +
+	            'A common mistake is to write oneOf(x, y, z) instead of oneOf([x, y, z]).'
+	          );
+	        } else {
+	          printWarning('Invalid argument supplied to oneOf, expected an array.');
+	        }
+	      }
+	      return emptyFunctionThatReturnsNull;
+	    }
+	
+	    function validate(props, propName, componentName, location, propFullName) {
+	      var propValue = props[propName];
+	      for (var i = 0; i < expectedValues.length; i++) {
+	        if (is(propValue, expectedValues[i])) {
+	          return null;
+	        }
+	      }
+	
+	      var valuesString = JSON.stringify(expectedValues, function replacer(key, value) {
+	        var type = getPreciseType(value);
+	        if (type === 'symbol') {
+	          return String(value);
+	        }
+	        return value;
+	      });
+	      return new PropTypeError('Invalid ' + location + ' `' + propFullName + '` of value `' + String(propValue) + '` ' + ('supplied to `' + componentName + '`, expected one of ' + valuesString + '.'));
+	    }
+	    return createChainableTypeChecker(validate);
+	  }
+	
+	  function createObjectOfTypeChecker(typeChecker) {
+	    function validate(props, propName, componentName, location, propFullName) {
+	      if (typeof typeChecker !== 'function') {
+	        return new PropTypeError('Property `' + propFullName + '` of component `' + componentName + '` has invalid PropType notation inside objectOf.');
+	      }
+	      var propValue = props[propName];
+	      var propType = getPropType(propValue);
+	      if (propType !== 'object') {
+	        return new PropTypeError('Invalid ' + location + ' `' + propFullName + '` of type ' + ('`' + propType + '` supplied to `' + componentName + '`, expected an object.'));
+	      }
+	      for (var key in propValue) {
+	        if (has(propValue, key)) {
+	          var error = typeChecker(propValue, key, componentName, location, propFullName + '.' + key, ReactPropTypesSecret);
+	          if (error instanceof Error) {
+	            return error;
+	          }
+	        }
+	      }
+	      return null;
+	    }
+	    return createChainableTypeChecker(validate);
+	  }
+	
+	  function createUnionTypeChecker(arrayOfTypeCheckers) {
+	    if (!Array.isArray(arrayOfTypeCheckers)) {
+	       true ? printWarning('Invalid argument supplied to oneOfType, expected an instance of array.') : void 0;
+	      return emptyFunctionThatReturnsNull;
+	    }
+	
+	    for (var i = 0; i < arrayOfTypeCheckers.length; i++) {
+	      var checker = arrayOfTypeCheckers[i];
+	      if (typeof checker !== 'function') {
+	        printWarning(
+	          'Invalid argument supplied to oneOfType. Expected an array of check functions, but ' +
+	          'received ' + getPostfixForTypeWarning(checker) + ' at index ' + i + '.'
+	        );
+	        return emptyFunctionThatReturnsNull;
+	      }
+	    }
+	
+	    function validate(props, propName, componentName, location, propFullName) {
+	      for (var i = 0; i < arrayOfTypeCheckers.length; i++) {
+	        var checker = arrayOfTypeCheckers[i];
+	        if (checker(props, propName, componentName, location, propFullName, ReactPropTypesSecret) == null) {
+	          return null;
+	        }
+	      }
+	
+	      return new PropTypeError('Invalid ' + location + ' `' + propFullName + '` supplied to ' + ('`' + componentName + '`.'));
+	    }
+	    return createChainableTypeChecker(validate);
+	  }
+	
+	  function createNodeChecker() {
+	    function validate(props, propName, componentName, location, propFullName) {
+	      if (!isNode(props[propName])) {
+	        return new PropTypeError('Invalid ' + location + ' `' + propFullName + '` supplied to ' + ('`' + componentName + '`, expected a ReactNode.'));
+	      }
+	      return null;
+	    }
+	    return createChainableTypeChecker(validate);
+	  }
+	
+	  function createShapeTypeChecker(shapeTypes) {
+	    function validate(props, propName, componentName, location, propFullName) {
+	      var propValue = props[propName];
+	      var propType = getPropType(propValue);
+	      if (propType !== 'object') {
+	        return new PropTypeError('Invalid ' + location + ' `' + propFullName + '` of type `' + propType + '` ' + ('supplied to `' + componentName + '`, expected `object`.'));
+	      }
+	      for (var key in shapeTypes) {
+	        var checker = shapeTypes[key];
+	        if (!checker) {
+	          continue;
+	        }
+	        var error = checker(propValue, key, componentName, location, propFullName + '.' + key, ReactPropTypesSecret);
+	        if (error) {
+	          return error;
+	        }
+	      }
+	      return null;
+	    }
+	    return createChainableTypeChecker(validate);
+	  }
+	
+	  function createStrictShapeTypeChecker(shapeTypes) {
+	    function validate(props, propName, componentName, location, propFullName) {
+	      var propValue = props[propName];
+	      var propType = getPropType(propValue);
+	      if (propType !== 'object') {
+	        return new PropTypeError('Invalid ' + location + ' `' + propFullName + '` of type `' + propType + '` ' + ('supplied to `' + componentName + '`, expected `object`.'));
+	      }
+	      // We need to check all keys in case some are required but missing from
+	      // props.
+	      var allKeys = assign({}, props[propName], shapeTypes);
+	      for (var key in allKeys) {
+	        var checker = shapeTypes[key];
+	        if (!checker) {
+	          return new PropTypeError(
+	            'Invalid ' + location + ' `' + propFullName + '` key `' + key + '` supplied to `' + componentName + '`.' +
+	            '\nBad object: ' + JSON.stringify(props[propName], null, '  ') +
+	            '\nValid keys: ' +  JSON.stringify(Object.keys(shapeTypes), null, '  ')
+	          );
+	        }
+	        var error = checker(propValue, key, componentName, location, propFullName + '.' + key, ReactPropTypesSecret);
+	        if (error) {
+	          return error;
+	        }
+	      }
+	      return null;
+	    }
+	
+	    return createChainableTypeChecker(validate);
+	  }
+	
+	  function isNode(propValue) {
+	    switch (typeof propValue) {
+	      case 'number':
+	      case 'string':
+	      case 'undefined':
+	        return true;
+	      case 'boolean':
+	        return !propValue;
+	      case 'object':
+	        if (Array.isArray(propValue)) {
+	          return propValue.every(isNode);
+	        }
+	        if (propValue === null || isValidElement(propValue)) {
+	          return true;
+	        }
+	
+	        var iteratorFn = getIteratorFn(propValue);
+	        if (iteratorFn) {
+	          var iterator = iteratorFn.call(propValue);
+	          var step;
+	          if (iteratorFn !== propValue.entries) {
+	            while (!(step = iterator.next()).done) {
+	              if (!isNode(step.value)) {
+	                return false;
+	              }
+	            }
+	          } else {
+	            // Iterator will provide entry [k,v] tuples rather than values.
+	            while (!(step = iterator.next()).done) {
+	              var entry = step.value;
+	              if (entry) {
+	                if (!isNode(entry[1])) {
+	                  return false;
+	                }
+	              }
+	            }
+	          }
+	        } else {
+	          return false;
+	        }
+	
+	        return true;
+	      default:
+	        return false;
+	    }
+	  }
+	
+	  function isSymbol(propType, propValue) {
+	    // Native Symbol.
+	    if (propType === 'symbol') {
+	      return true;
+	    }
+	
+	    // falsy value can't be a Symbol
+	    if (!propValue) {
+	      return false;
+	    }
+	
+	    // 19.4.3.5 Symbol.prototype[@@toStringTag] === 'Symbol'
+	    if (propValue['@@toStringTag'] === 'Symbol') {
+	      return true;
+	    }
+	
+	    // Fallback for non-spec compliant Symbols which are polyfilled.
+	    if (typeof Symbol === 'function' && propValue instanceof Symbol) {
+	      return true;
+	    }
+	
+	    return false;
+	  }
+	
+	  // Equivalent of `typeof` but with special handling for array and regexp.
+	  function getPropType(propValue) {
+	    var propType = typeof propValue;
+	    if (Array.isArray(propValue)) {
+	      return 'array';
+	    }
+	    if (propValue instanceof RegExp) {
+	      // Old webkits (at least until Android 4.0) return 'function' rather than
+	      // 'object' for typeof a RegExp. We'll normalize this here so that /bla/
+	      // passes PropTypes.object.
+	      return 'object';
+	    }
+	    if (isSymbol(propType, propValue)) {
+	      return 'symbol';
+	    }
+	    return propType;
+	  }
+	
+	  // This handles more types than `getPropType`. Only used for error messages.
+	  // See `createPrimitiveTypeChecker`.
+	  function getPreciseType(propValue) {
+	    if (typeof propValue === 'undefined' || propValue === null) {
+	      return '' + propValue;
+	    }
+	    var propType = getPropType(propValue);
+	    if (propType === 'object') {
+	      if (propValue instanceof Date) {
+	        return 'date';
+	      } else if (propValue instanceof RegExp) {
+	        return 'regexp';
+	      }
+	    }
+	    return propType;
+	  }
+	
+	  // Returns a string that is postfixed to a warning about an invalid type.
+	  // For example, "undefined" or "of type array"
+	  function getPostfixForTypeWarning(value) {
+	    var type = getPreciseType(value);
+	    switch (type) {
+	      case 'array':
+	      case 'object':
+	        return 'an ' + type;
+	      case 'boolean':
+	      case 'date':
+	      case 'regexp':
+	        return 'a ' + type;
+	      default:
+	        return type;
+	    }
+	  }
+	
+	  // Returns class name of the object, if any.
+	  function getClassName(propValue) {
+	    if (!propValue.constructor || !propValue.constructor.name) {
+	      return ANONYMOUS;
+	    }
+	    return propValue.constructor.name;
+	  }
+	
+	  ReactPropTypes.checkPropTypes = checkPropTypes;
+	  ReactPropTypes.resetWarningCache = checkPropTypes.resetWarningCache;
+	  ReactPropTypes.PropTypes = ReactPropTypes;
+	
+	  return ReactPropTypes;
+	};
+
+
+/***/ }),
+/* 7 */
+/*!***********************************!*\
+  !*** ../~/object-assign/index.js ***!
+  \***********************************/
+/***/ (function(module, exports) {
+
+	/*
+	object-assign
+	(c) Sindre Sorhus
+	@license MIT
+	*/
+	
+	'use strict';
+	/* eslint-disable no-unused-vars */
+	var getOwnPropertySymbols = Object.getOwnPropertySymbols;
+	var hasOwnProperty = Object.prototype.hasOwnProperty;
+	var propIsEnumerable = Object.prototype.propertyIsEnumerable;
+	
+	function toObject(val) {
+		if (val === null || val === undefined) {
+			throw new TypeError('Object.assign cannot be called with null or undefined');
+		}
+	
+		return Object(val);
+	}
+	
+	function shouldUseNative() {
+		try {
+			if (!Object.assign) {
+				return false;
+			}
+	
+			// Detect buggy property enumeration order in older V8 versions.
+	
+			// https://bugs.chromium.org/p/v8/issues/detail?id=4118
+			var test1 = new String('abc');  // eslint-disable-line no-new-wrappers
+			test1[5] = 'de';
+			if (Object.getOwnPropertyNames(test1)[0] === '5') {
+				return false;
+			}
+	
+			// https://bugs.chromium.org/p/v8/issues/detail?id=3056
+			var test2 = {};
+			for (var i = 0; i < 10; i++) {
+				test2['_' + String.fromCharCode(i)] = i;
+			}
+			var order2 = Object.getOwnPropertyNames(test2).map(function (n) {
+				return test2[n];
+			});
+			if (order2.join('') !== '0123456789') {
+				return false;
+			}
+	
+			// https://bugs.chromium.org/p/v8/issues/detail?id=3056
+			var test3 = {};
+			'abcdefghijklmnopqrst'.split('').forEach(function (letter) {
+				test3[letter] = letter;
+			});
+			if (Object.keys(Object.assign({}, test3)).join('') !==
+					'abcdefghijklmnopqrst') {
+				return false;
+			}
+	
+			return true;
+		} catch (err) {
+			// We don't expect any of the above to throw, but better to be safe.
+			return false;
+		}
+	}
+	
+	module.exports = shouldUseNative() ? Object.assign : function (target, source) {
+		var from;
+		var to = toObject(target);
+		var symbols;
+	
+		for (var s = 1; s < arguments.length; s++) {
+			from = Object(arguments[s]);
+	
+			for (var key in from) {
+				if (hasOwnProperty.call(from, key)) {
+					to[key] = from[key];
+				}
+			}
+	
+			if (getOwnPropertySymbols) {
+				symbols = getOwnPropertySymbols(from);
+				for (var i = 0; i < symbols.length; i++) {
+					if (propIsEnumerable.call(from, symbols[i])) {
+						to[symbols[i]] = from[symbols[i]];
+					}
+				}
+			}
+		}
+	
+		return to;
+	};
+
+
+/***/ }),
+/* 8 */
+/*!***************************************************!*\
+  !*** ../~/prop-types/lib/ReactPropTypesSecret.js ***!
+  \***************************************************/
+/***/ (function(module, exports) {
+
+	/**
+	 * Copyright (c) 2013-present, Facebook, Inc.
+	 *
+	 * This source code is licensed under the MIT license found in the
+	 * LICENSE file in the root directory of this source tree.
+	 */
+	
+	'use strict';
+	
+	var ReactPropTypesSecret = 'SECRET_DO_NOT_PASS_THIS_OR_YOU_WILL_BE_FIRED';
+	
+	module.exports = ReactPropTypesSecret;
+
+
+/***/ }),
+/* 9 */
+/*!*****************************************!*\
+  !*** ../~/prop-types/checkPropTypes.js ***!
+  \*****************************************/
+/***/ (function(module, exports, __webpack_require__) {
+
+	/**
+	 * Copyright (c) 2013-present, Facebook, Inc.
+	 *
+	 * This source code is licensed under the MIT license found in the
+	 * LICENSE file in the root directory of this source tree.
+	 */
+	
+	'use strict';
+	
+	var printWarning = function() {};
+	
+	if (true) {
+	  var ReactPropTypesSecret = __webpack_require__(/*! ./lib/ReactPropTypesSecret */ 8);
+	  var loggedTypeFailures = {};
+	  var has = Function.call.bind(Object.prototype.hasOwnProperty);
+	
+	  printWarning = function(text) {
+	    var message = 'Warning: ' + text;
+	    if (typeof console !== 'undefined') {
+	      console.error(message);
+	    }
+	    try {
+	      // --- Welcome to debugging React ---
+	      // This error was thrown as a convenience so that you can use this stack
+	      // to find the callsite that caused this warning to fire.
+	      throw new Error(message);
+	    } catch (x) {}
+	  };
+	}
+	
+	/**
+	 * Assert that the values match with the type specs.
+	 * Error messages are memorized and will only be shown once.
+	 *
+	 * @param {object} typeSpecs Map of name to a ReactPropType
+	 * @param {object} values Runtime values that need to be type-checked
+	 * @param {string} location e.g. "prop", "context", "child context"
+	 * @param {string} componentName Name of the component for error messages.
+	 * @param {?Function} getStack Returns the component stack.
+	 * @private
+	 */
+	function checkPropTypes(typeSpecs, values, location, componentName, getStack) {
+	  if (true) {
+	    for (var typeSpecName in typeSpecs) {
+	      if (has(typeSpecs, typeSpecName)) {
+	        var error;
+	        // Prop type validation may throw. In case they do, we don't want to
+	        // fail the render phase where it didn't fail before. So we log it.
+	        // After these have been cleaned up, we'll let them throw.
+	        try {
+	          // This is intentionally an invariant that gets caught. It's the same
+	          // behavior as without this statement except with a better message.
+	          if (typeof typeSpecs[typeSpecName] !== 'function') {
+	            var err = Error(
+	              (componentName || 'React class') + ': ' + location + ' type `' + typeSpecName + '` is invalid; ' +
+	              'it must be a function, usually from the `prop-types` package, but received `' + typeof typeSpecs[typeSpecName] + '`.'
+	            );
+	            err.name = 'Invariant Violation';
+	            throw err;
+	          }
+	          error = typeSpecs[typeSpecName](values, typeSpecName, componentName, location, null, ReactPropTypesSecret);
+	        } catch (ex) {
+	          error = ex;
+	        }
+	        if (error && !(error instanceof Error)) {
+	          printWarning(
+	            (componentName || 'React class') + ': type specification of ' +
+	            location + ' `' + typeSpecName + '` is invalid; the type checker ' +
+	            'function must return `null` or an `Error` but returned a ' + typeof error + '. ' +
+	            'You may have forgotten to pass an argument to the type checker ' +
+	            'creator (arrayOf, instanceOf, objectOf, oneOf, oneOfType, and ' +
+	            'shape all require an argument).'
+	          );
+	        }
+	        if (error instanceof Error && !(error.message in loggedTypeFailures)) {
+	          // Only monitor this failure once because there tends to be a lot of the
+	          // same error.
+	          loggedTypeFailures[error.message] = true;
+	
+	          var stack = getStack ? getStack() : '';
+	
+	          printWarning(
+	            'Failed ' + location + ' type: ' + error.message + (stack != null ? stack : '')
+	          );
+	        }
+	      }
+	    }
+	  }
+	}
+	
+	/**
+	 * Resets warning cache when testing.
+	 *
+	 * @private
+	 */
+	checkPropTypes.resetWarningCache = function() {
+	  if (true) {
+	    loggedTypeFailures = {};
+	  }
+	}
+	
+	module.exports = checkPropTypes;
+
+
+/***/ }),
+/* 10 */
+/*!*************************************!*\
+  !*** ../~/resumablejs/resumable.js ***!
+  \*************************************/
+/***/ (function(module, exports, __webpack_require__) {
+
+	/*
+	 * MIT Licensed
+	 * http://www.23developer.com/opensource
+	 * http://github.com/23/resumable.js
+	 * Steffen Tiedemann Christensen, steffen@23company.com
+	 */
+	
+	(function () {
+	  "use strict";
+	
+	  var Resumable = function (opts) {
+	    if (!(this instanceof Resumable)) {
+	      return new Resumable(opts);
+	    }
+	    this.version = 1.0;
+	    // SUPPORTED BY BROWSER?
+	    // Check if these features are support by the browser:
+	    // - File object type
+	    // - Blob object type
+	    // - FileList object type
+	    // - slicing files
+	    this.support =
+	      typeof File !== "undefined" &&
+	      typeof Blob !== "undefined" &&
+	      typeof FileList !== "undefined" &&
+	      (!!Blob.prototype.webkitSlice ||
+	        !!Blob.prototype.mozSlice ||
+	        !!Blob.prototype.slice ||
+	        false);
+	    if (!this.support) return false;
+	
+	    // PROPERTIES
+	    var $ = this;
+	    $.files = [];
+	    $.subject = "";
+	    $.defaults = {
+	      chunkSize: 1 * 1024 * 1024,
+	      forceChunkSize: false,
+	      simultaneousUploads: 3,
+	      fileParameterName: "file",
+	      chunkNumberParameterName: "resumableChunkNumber",
+	      chunkSizeParameterName: "resumableChunkSize",
+	      currentChunkSizeParameterName: "resumableCurrentChunkSize",
+	      totalSizeParameterName: "resumableTotalSize",
+	      typeParameterName: "resumableType",
+	      identifierParameterName: "resumableIdentifier",
+	      fileNameParameterName: "resumableFilename",
+	      relativePathParameterName: "resumableRelativePath",
+	      totalChunksParameterName: "resumableTotalChunks",
+	      subjectParameterName: "subject",
+	      throttleProgressCallbacks: 0.5,
+	      query: {},
+	      headers: {},
+	      preprocess: null,
+	      method: "multipart",
+	      uploadMethod: "POST",
+	      testMethod: "GET",
+	      prioritizeFirstAndLastChunk: false,
+	      target: "/",
+	      testTarget: null,
+	      parameterNamespace: "",
+	      testChunks: true,
+	      generateUniqueIdentifier: null,
+	      getTarget: null,
+	      maxChunkRetries: 100,
+	      chunkRetryInterval: undefined,
+	      permanentErrors: [400, 404, 415, 500, 501],
+	      maxFiles: undefined,
+	      withCredentials: false,
+	      xhrTimeout: 0,
+	      clearInput: true,
+	      chunkFormat: "blob",
+	      setChunkTypeFromFile: false,
+	      maxFilesErrorCallback: function (files, errorCount) {
+	        var maxFiles = $.getOpt("maxFiles");
+	        alert(
+	          "Please upload no more than " +
+	            maxFiles +
+	            " file" +
+	            (maxFiles === 1 ? "" : "s") +
+	            " at a time."
+	        );
+	      },
+	      minFileSize: 1,
+	      minFileSizeErrorCallback: function (file, errorCount) {
+	        alert(
+	          file.fileName ||
+	            file.name +
+	              " is too small, please upload files larger than " +
+	              $h.formatSize($.getOpt("minFileSize")) +
+	              "."
+	        );
+	      },
+	      maxFileSize: undefined,
+	      maxFileSizeErrorCallback: function (file, errorCount) {
+	        alert(
+	          file.fileName ||
+	            file.name +
+	              " is too large, please upload files less than " +
+	              $h.formatSize($.getOpt("maxFileSize")) +
+	              "."
+	        );
+	      },
+	      fileType: [],
+	      fileTypeErrorCallback: function (file, errorCount) {
+	        alert(
+	          file.fileName ||
+	            file.name +
+	              " has type not allowed, please upload files of type " +
+	              $.getOpt("fileType") +
+	              "."
+	        );
+	      },
+	    };
+	    $.opts = opts || {};
+	    $.getOpt = function (o) {
+	      var $opt = this;
+	      // Get multiple option if passed an array
+	      if (o instanceof Array) {
+	        var options = {};
+	        $h.each(o, function (option) {
+	          options[option] = $opt.getOpt(option);
+	        });
+	        return options;
+	      }
+	      // Otherwise, just return a simple option
+	      if ($opt instanceof ResumableChunk) {
+	        if (typeof $opt.opts[o] !== "undefined") {
+	          return $opt.opts[o];
+	        } else {
+	          $opt = $opt.fileObj;
+	        }
+	      }
+	      if ($opt instanceof ResumableFile) {
+	        if (typeof $opt.opts[o] !== "undefined") {
+	          return $opt.opts[o];
+	        } else {
+	          $opt = $opt.resumableObj;
+	        }
+	      }
+	      if ($opt instanceof Resumable) {
+	        if (typeof $opt.opts[o] !== "undefined") {
+	          return $opt.opts[o];
+	        } else {
+	          return $opt.defaults[o];
+	        }
+	      }
+	    };
+	
+	    // EVENTS
+	    // catchAll(event, ...)
+	    // fileSuccess(file), fileProgress(file), fileAdded(file, event), filesAdded(files, filesSkipped), fileRetry(file),
+	    // fileError(file, message), complete(), progress(), error(message, file), pause()
+	    $.events = [];
+	    $.on = function (event, callback) {
+	      $.events.push(event.toLowerCase(), callback);
+	    };
+	    $.fire = function () {
+	      // `arguments` is an object, not array, in FF, so:
+	      var args = [];
+	      for (var i = 0; i < arguments.length; i++) args.push(arguments[i]);
+	      // Find event listeners, and support pseudo-event `catchAll`
+	      var event = args[0].toLowerCase();
+	      for (var i = 0; i <= $.events.length; i += 2) {
+	        if ($.events[i] == event) $.events[i + 1].apply($, args.slice(1));
+	        if ($.events[i] == "catchall") $.events[i + 1].apply(null, args);
+	      }
+	      if (event == "fileerror") $.fire("error", args[2], args[1]);
+	      if (event == "fileprogress") $.fire("progress");
+	    };
+	
+	    // INTERNAL HELPER METHODS (handy, but ultimately not part of uploading)
+	    var $h = {
+	      stopEvent: function (e) {
+	        e.stopPropagation();
+	        e.preventDefault();
+	      },
+	      each: function (o, callback) {
+	        if (typeof o.length !== "undefined") {
+	          for (var i = 0; i < o.length; i++) {
+	            // Array or FileList
+	            if (callback(o[i]) === false) return;
+	          }
+	        } else {
+	          for (i in o) {
+	            // Object
+	            if (callback(i, o[i]) === false) return;
+	          }
+	        }
+	      },
+	      generateUniqueIdentifier: function (file, event) {
+	        var custom = $.getOpt("generateUniqueIdentifier");
+	        if (typeof custom === "function") {
+	          return custom(file, event);
+	        }
+	        var relativePath =
+	          file.webkitRelativePath || file.fileName || file.name; // Some confusion in different versions of Firefox
+	        var size = file.size;
+	        return size + "-" + relativePath.replace(/[^0-9a-zA-Z_-]/gim, "");
+	      },
+	      contains: function (array, test) {
+	        var result = false;
+	
+	        $h.each(array, function (value) {
+	          if (value == test) {
+	            result = true;
+	            return false;
+	          }
+	          return true;
+	        });
+	
+	        return result;
+	      },
+	      formatSize: function (size) {
+	        if (size < 1024) {
+	          return size + " bytes";
+	        } else if (size < 1024 * 1024) {
+	          return (size / 1024.0).toFixed(0) + " KB";
+	        } else if (size < 1024 * 1024 * 1024) {
+	          return (size / 1024.0 / 1024.0).toFixed(1) + " MB";
+	        } else {
+	          return (size / 1024.0 / 1024.0 / 1024.0).toFixed(1) + " GB";
+	        }
+	      },
+	      getTarget: function (request, params) {
+	        var target = $.getOpt("target");
+	
+	        if (request === "test" && $.getOpt("testTarget")) {
+	          target =
+	            $.getOpt("testTarget") === "/"
+	              ? $.getOpt("target")
+	              : $.getOpt("testTarget");
+	        }
+	
+	        if (typeof target === "function") {
+	          return target(params);
+	        }
+	
+	        var separator = target.indexOf("?") < 0 ? "?" : "&";
+	        var joinedParams = params.join("&");
+	
+	        return target + separator + joinedParams;
+	      },
+	    };
+	
+	    var onDrop = function (event) {
+	      $h.stopEvent(event);
+	
+	      //handle dropped things as items if we can (this lets us deal with folders nicer in some cases)
+	      if (event.dataTransfer && event.dataTransfer.items) {
+	        loadFiles(event.dataTransfer.items, event);
+	      }
+	      //else handle them as files
+	      else if (event.dataTransfer && event.dataTransfer.files) {
+	        loadFiles(event.dataTransfer.files, event);
+	      }
+	    };
+	    var preventDefault = function (e) {
+	      e.preventDefault();
+	    };
+	
+	    /**
+	     * processes a single upload item (file or directory)
+	     * @param {Object} item item to upload, may be file or directory entry
+	     * @param {string} path current file path
+	     * @param {File[]} items list of files to append new items to
+	     * @param {Function} cb callback invoked when item is processed
+	     */
+	    function processItem(item, path, items, cb) {
+	      var entry;
+	      if (item.isFile) {
+	        // file provided
+	        return item.file(function (file) {
+	          file.relativePath = path + file.name;
+	          items.push(file);
+	          cb();
+	        });
+	      } else if (item.isDirectory) {
+	        // item is already a directory entry, just assign
+	        entry = item;
+	      } else if (item instanceof File) {
+	        items.push(item);
+	      }
+	      if ("function" === typeof item.webkitGetAsEntry) {
+	        // get entry from file object
+	        entry = item.webkitGetAsEntry();
+	      }
+	      if (entry && entry.isDirectory) {
+	        // directory provided, process it
+	        return processDirectory(entry, path + entry.name + "/", items, cb);
+	      }
+	      if ("function" === typeof item.getAsFile) {
+	        // item represents a File object, convert it
+	        item = item.getAsFile();
+	        if (item instanceof File) {
+	          item.relativePath = path + item.name;
+	          items.push(item);
+	        }
+	      }
+	      cb(); // indicate processing is done
+	    }
+	
+	    /**
+	     * cps-style list iteration.
+	     * invokes all functions in list and waits for their callback to be
+	     * triggered.
+	     * @param  {Function[]}   items list of functions expecting callback parameter
+	     * @param  {Function} cb    callback to trigger after the last callback has been invoked
+	     */
+	    function processCallbacks(items, cb) {
+	      if (!items || items.length === 0) {
+	        // empty or no list, invoke callback
+	        return cb();
+	      }
+	      // invoke current function, pass the next part as continuation
+	      items[0](function () {
+	        processCallbacks(items.slice(1), cb);
+	      });
+	    }
+	
+	    /**
+	     * recursively traverse directory and collect files to upload
+	     * @param  {Object}   directory directory to process
+	     * @param  {string}   path      current path
+	     * @param  {File[]}   items     target list of items
+	     * @param  {Function} cb        callback invoked after traversing directory
+	     */
+	    function processDirectory(directory, path, items, cb) {
+	      var dirReader = directory.createReader();
+	      dirReader.readEntries(function (entries) {
+	        if (!entries.length) {
+	          // empty directory, skip
+	          return cb();
+	        }
+	        // process all conversion callbacks, finally invoke own one
+	        processCallbacks(
+	          entries.map(function (entry) {
+	            // bind all properties except for callback
+	            return processItem.bind(null, entry, path, items);
+	          }),
+	          cb
+	        );
+	      });
+	    }
+	
+	    /**
+	     * process items to extract files to be uploaded
+	     * @param  {File[]} items items to process
+	     * @param  {Event} event event that led to upload
+	     */
+	    function loadFiles(items, event) {
+	      if (!items.length) {
+	        return; // nothing to do
+	      }
+	      $.fire("beforeAdd");
+	      var files = [];
+	      processCallbacks(
+	        Array.prototype.map.call(items, function (item) {
+	          // bind all properties except for callback
+	          return processItem.bind(null, item, "", files);
+	        }),
+	        function () {
+	          if (files.length) {
+	            // at least one file found
+	            appendFilesFromFileList(files, event);
+	          }
+	        }
+	      );
+	    }
+	
+	    var appendFilesFromFileList = function (fileList, event) {
+	      // check for uploading too many files
+	      var errorCount = 0;
+	      var o = $.getOpt([
+	        "maxFiles",
+	        "minFileSize",
+	        "maxFileSize",
+	        "maxFilesErrorCallback",
+	        "minFileSizeErrorCallback",
+	        "maxFileSizeErrorCallback",
+	        "fileType",
+	        "fileTypeErrorCallback",
+	      ]);
+	      if (
+	        typeof o.maxFiles !== "undefined" &&
+	        o.maxFiles < fileList.length + $.files.length
+	      ) {
+	        // if single-file upload, file is already added, and trying to add 1 new file, simply replace the already-added file
+	        if (o.maxFiles === 1 && $.files.length === 1 && fileList.length === 1) {
+	          $.removeFile($.files[0]);
+	        } else {
+	          o.maxFilesErrorCallback(fileList, errorCount++);
+	          return false;
+	        }
+	      }
+	      var files = [],
+	        filesSkipped = [],
+	        remaining = fileList.length;
+	      var decreaseReamining = function () {
+	        if (!--remaining) {
+	          // all files processed, trigger event
+	          if (!files.length && !filesSkipped.length) {
+	            // no succeeded files, just skip
+	            return;
+	          }
+	          window.setTimeout(function () {
+	            $.fire("filesAdded", files, filesSkipped);
+	          }, 0);
+	        }
+	      };
+	      $h.each(fileList, function (file) {
+	        var fileName = file.name;
+	        if (o.fileType.length > 0) {
+	          var fileTypeFound = false;
+	          for (var index in o.fileType) {
+	            var extension = "." + o.fileType[index];
+	            if (
+	              fileName
+	                .toLowerCase()
+	                .indexOf(
+	                  extension.toLowerCase(),
+	                  fileName.length - extension.length
+	                ) !== -1
+	            ) {
+	              fileTypeFound = true;
+	              break;
+	            }
+	          }
+	          if (!fileTypeFound) {
+	            o.fileTypeErrorCallback(file, errorCount++);
+	            return false;
+	          }
+	        }
+	
+	        if (typeof o.minFileSize !== "undefined" && file.size < o.minFileSize) {
+	          o.minFileSizeErrorCallback(file, errorCount++);
+	          return false;
+	        }
+	        if (typeof o.maxFileSize !== "undefined" && file.size > o.maxFileSize) {
+	          o.maxFileSizeErrorCallback(file, errorCount++);
+	          return false;
+	        }
+	
+	        function addFile(uniqueIdentifier) {
+	          if (!$.getFromUniqueIdentifier(uniqueIdentifier)) {
+	            (function () {
+	              file.uniqueIdentifier = uniqueIdentifier;
+	              var f = new ResumableFile($, file, uniqueIdentifier);
+	              $.files.push(f);
+	              files.push(f);
+	              f.container =
+	                typeof event != "undefined" ? event.srcElement : null;
+	              window.setTimeout(function () {
+	                $.fire("fileAdded", f, event);
+	              }, 0);
+	            })();
+	          } else {
+	            filesSkipped.push(file);
+	          }
+	          decreaseReamining();
+	        }
+	        // directories have size == 0
+	        var uniqueIdentifier = $h.generateUniqueIdentifier(file, event);
+	        if (uniqueIdentifier && typeof uniqueIdentifier.then === "function") {
+	          // Promise or Promise-like object provided as unique identifier
+	          uniqueIdentifier.then(
+	            function (uniqueIdentifier) {
+	              // unique identifier generation succeeded
+	              addFile(uniqueIdentifier);
+	            },
+	            function () {
+	              // unique identifier generation failed
+	              // skip further processing, only decrease file count
+	              decreaseReamining();
+	            }
+	          );
+	        } else {
+	          // non-Promise provided as unique identifier, process synchronously
+	          addFile(uniqueIdentifier);
+	        }
+	      });
+	    };
+	
+	    // INTERNAL OBJECT TYPES
+	    function ResumableFile(resumableObj, file, uniqueIdentifier) {
+	      var $ = this;
+	      $.opts = {};
+	      $.getOpt = resumableObj.getOpt;
+	      $.subject = resumableObj.subject;
+	      $._prevProgress = 0;
+	      $.resumableObj = resumableObj;
+	      $.file = file;
+	      $.fileName = file.fileName || file.name; // Some confusion in different versions of Firefox
+	      $.size = file.size;
+	      $.relativePath =
+	        file.relativePath || file.webkitRelativePath || $.fileName;
+	      $.uniqueIdentifier = uniqueIdentifier;
+	      $._pause = false;
+	      $.container = "";
+	      var _error = uniqueIdentifier !== undefined;
+	
+	      // Callback when something happens within the chunk
+	      var chunkEvent = function (event, message) {
+	        // event can be 'progress', 'success', 'error' or 'retry'
+	        switch (event) {
+	          case "progress":
+	            $.resumableObj.fire("fileProgress", $, message);
+	            break;
+	          case "error":
+	            $.abort();
+	            _error = true;
+	            $.chunks = [];
+	            $.resumableObj.fire("fileError", $, message);
+	            break;
+	          case "success":
+	            if (_error) return;
+	            $.resumableObj.fire("fileProgress", $); // it's at least progress
+	            if ($.isComplete()) {
+	              $.resumableObj.fire("fileSuccess", $, message);
+	            }
+	            break;
+	          case "retry":
+	            $.resumableObj.fire("fileRetry", $);
+	            break;
+	        }
+	      };
+	
+	      // Main code to set up a file object with chunks,
+	      // packaged to be able to handle retries if needed.
+	      $.chunks = [];
+	      $.abort = function () {
+	        // Stop current uploads
+	        var abortCount = 0;
+	        $h.each($.chunks, function (c) {
+	          if (c.status() == "uploading") {
+	            c.abort();
+	            abortCount++;
+	          }
+	        });
+	        if (abortCount > 0) $.resumableObj.fire("fileProgress", $);
+	      };
+	      $.cancel = function () {
+	        // Reset this file to be void
+	        var _chunks = $.chunks;
+	        $.chunks = [];
+	        // Stop current uploads
+	        $h.each(_chunks, function (c) {
+	          if (c.status() == "uploading") {
+	            c.abort();
+	            $.resumableObj.uploadNextChunk();
+	          }
+	        });
+	        $.resumableObj.removeFile($);
+	        $.resumableObj.fire("fileProgress", $);
+	      };
+	      $.retry = function () {
+	        $.bootstrap();
+	        var firedRetry = false;
+	        $.resumableObj.on("chunkingComplete", function () {
+	          if (!firedRetry) $.resumableObj.upload();
+	          firedRetry = true;
+	        });
+	      };
+	      $.bootstrap = function () {
+	        $.abort();
+	        _error = false;
+	        // Rebuild stack of chunks from file
+	        $.chunks = [];
+	        $._prevProgress = 0;
+	        var round = $.getOpt("forceChunkSize") ? Math.ceil : Math.floor;
+	        var maxOffset = Math.max(round($.file.size / $.getOpt("chunkSize")), 1);
+	        for (var offset = 0; offset < maxOffset; offset++) {
+	          (function (offset) {
+	            window.setTimeout(function () {
+	              $.chunks.push(
+	                new ResumableChunk($.resumableObj, $, offset, chunkEvent)
+	              );
+	              $.resumableObj.fire("chunkingProgress", $, offset / maxOffset);
+	            }, 0);
+	          })(offset);
+	        }
+	        window.setTimeout(function () {
+	          $.resumableObj.fire("chunkingComplete", $);
+	        }, 0);
+	      };
+	      $.progress = function () {
+	        if (_error) return 1;
+	        // Sum up progress across everything
+	        var ret = 0;
+	        var error = false;
+	        $h.each($.chunks, function (c) {
+	          if (c.status() == "error") error = true;
+	          ret += c.progress(true); // get chunk progress relative to entire file
+	        });
+	        ret = error ? 1 : ret > 0.99999 ? 1 : ret;
+	        ret = Math.max($._prevProgress, ret); // We don't want to lose percentages when an upload is paused
+	        $._prevProgress = ret;
+	        return ret;
+	      };
+	      $.isUploading = function () {
+	        var uploading = false;
+	        $h.each($.chunks, function (chunk) {
+	          if (chunk.status() == "uploading") {
+	            uploading = true;
+	            return false;
+	          }
+	        });
+	        return uploading;
+	      };
+	      $.isComplete = function () {
+	        var outstanding = false;
+	        $h.each($.chunks, function (chunk) {
+	          var status = chunk.status();
+	          if (
+	            status == "pending" ||
+	            status == "uploading" ||
+	            chunk.preprocessState === 1
+	          ) {
+	            outstanding = true;
+	            return false;
+	          }
+	        });
+	        return !outstanding;
+	      };
+	      $.pause = function (pause) {
+	        if (typeof pause === "undefined") {
+	          $._pause = $._pause ? false : true;
+	        } else {
+	          $._pause = pause;
+	        }
+	      };
+	      $.isPaused = function () {
+	        return $._pause;
+	      };
+	
+	      // Bootstrap and return
+	      $.resumableObj.fire("chunkingStart", $);
+	      $.bootstrap();
+	      return this;
+	    }
+	
+	    function ResumableChunk(resumableObj, fileObj, offset, callback) {
+	      var $ = this;
+	      $.opts = {};
+	      $.getOpt = resumableObj.getOpt;
+	      $.subject = resumableObj.subject;
+	      $.resumableObj = resumableObj;
+	      $.fileObj = fileObj;
+	      $.fileObjSize = fileObj.size;
+	      $.fileObjType = fileObj.file.type;
+	      $.offset = offset;
+	      $.callback = callback;
+	      $.lastProgressCallback = new Date();
+	      $.tested = false;
+	      $.retries = 0;
+	      $.pendingRetry = false;
+	      $.preprocessState = 0; // 0 = unprocessed, 1 = processing, 2 = finished
+	
+	      // Computed properties
+	      var chunkSize = $.getOpt("chunkSize");
+	      $.loaded = 0;
+	      $.startByte = $.offset * chunkSize;
+	      $.endByte = Math.min($.fileObjSize, ($.offset + 1) * chunkSize);
+	      if (
+	        $.fileObjSize - $.endByte < chunkSize &&
+	        !$.getOpt("forceChunkSize")
+	      ) {
+	        // The last chunk will be bigger than the chunk size, but less than 2*chunkSize
+	        $.endByte = $.fileObjSize;
+	      }
+	      $.xhr = null;
+	
+	      // test() makes a GET request without any data to see if the chunk has already been uploaded in a previous session
+	      $.test = function () {
+	        // Set up request and listen for event
+	        $.xhr = new XMLHttpRequest();
+	
+	        var testHandler = function (e) {
+	          $.tested = true;
+	          var status = $.status();
+	          if (status == "success") {
+	            $.callback(status, $.message());
+	            $.resumableObj.uploadNextChunk();
+	          } else {
+	            $.send();
+	          }
+	        };
+	        $.xhr.addEventListener("load", testHandler, false);
+	        $.xhr.addEventListener("error", testHandler, false);
+	        $.xhr.addEventListener("timeout", testHandler, false);
+	
+	        // Add data from the query options
+	        var params = [];
+	        var parameterNamespace = $.getOpt("parameterNamespace");
+	        var customQuery = $.getOpt("query");
+	        if (typeof customQuery == "function")
+	          customQuery = customQuery($.fileObj, $);
+	        $h.each(customQuery, function (k, v) {
+	          params.push(
+	            [
+	              encodeURIComponent(parameterNamespace + k),
+	              encodeURIComponent(v),
+	            ].join("=")
+	          );
+	        });
+	        // Add extra data to identify chunk
+	        params = params.concat(
+	          [
+	            // define key/value pairs for additional parameters
+	            ["chunkNumberParameterName", $.offset + 1],
+	            ["chunkSizeParameterName", $.getOpt("chunkSize")],
+	            ["currentChunkSizeParameterName", $.endByte - $.startByte],
+	            ["totalSizeParameterName", $.fileObjSize],
+	            ["typeParameterName", $.fileObjType],
+	            ["identifierParameterName", $.fileObj.uniqueIdentifier],
+	            ["fileNameParameterName", $.fileObj.fileName],
+	            ["relativePathParameterName", $.fileObj.relativePath],
+	            ["totalChunksParameterName", $.fileObj.chunks.length],
+	            ["subjectParameterName", $.subject],
+	          ]
+	            .filter(function (pair) {
+	              // include items that resolve to truthy values
+	              // i.e. exclude false, null, undefined and empty strings
+	              return $.getOpt(pair[0]);
+	            })
+	            .map(function (pair) {
+	              // map each key/value pair to its final form
+	              return [
+	                parameterNamespace + $.getOpt(pair[0]),
+	                encodeURIComponent(pair[1]),
+	              ].join("=");
+	            })
+	        );
+	        // Append the relevant chunk and send it
+	        $.xhr.open($.getOpt("testMethod"), $h.getTarget("test", params));
+	        $.xhr.timeout = $.getOpt("xhrTimeout");
+	        $.xhr.withCredentials = $.getOpt("withCredentials");
+	        // Add data from header options
+	        var customHeaders = $.getOpt("headers");
+	        if (typeof customHeaders === "function") {
+	          customHeaders = customHeaders($.fileObj, $);
+	        }
+	        $h.each(customHeaders, function (k, v) {
+	          $.xhr.setRequestHeader(k, v);
+	        });
+	        $.xhr.send(null);
+	      };
+	
+	      $.preprocessFinished = function () {
+	        $.preprocessState = 2;
+	        $.send();
+	      };
+	
+	      // send() uploads the actual data in a POST call
+	      $.send = function () {
+	        var preprocess = $.getOpt("preprocess");
+	        if (typeof preprocess === "function") {
+	          switch ($.preprocessState) {
+	            case 0:
+	              $.preprocessState = 1;
+	              preprocess($);
+	              return;
+	            case 1:
+	              return;
+	            case 2:
+	              break;
+	          }
+	        }
+	        if ($.getOpt("testChunks") && !$.tested) {
+	          $.test();
+	          return;
+	        }
+	
+	        // Set up request and listen for event
+	        $.xhr = new XMLHttpRequest();
+	
+	        // Progress
+	        $.xhr.upload.addEventListener(
+	          "progress",
+	          function (e) {
+	            if (
+	              new Date() - $.lastProgressCallback >
+	              $.getOpt("throttleProgressCallbacks") * 1000
+	            ) {
+	              $.callback("progress");
+	              $.lastProgressCallback = new Date();
+	            }
+	            $.loaded = e.loaded || 0;
+	          },
+	          false
+	        );
+	        $.loaded = 0;
+	        $.pendingRetry = false;
+	        $.callback("progress");
+	
+	        // Done (either done, failed or retry)
+	        var doneHandler = function (e) {
+	          var status = $.status();
+	          if (status == "success" || status == "error") {
+	            $.callback(status, $.message());
+	            $.resumableObj.uploadNextChunk();
+	          } else {
+	            $.callback("retry", $.message());
+	            $.abort();
+	            $.retries++;
+	            var retryInterval = $.getOpt("chunkRetryInterval");
+	            if (retryInterval !== undefined) {
+	              $.pendingRetry = true;
+	              setTimeout($.send, retryInterval);
+	            } else {
+	              $.send();
+	            }
+	          }
+	        };
+	        $.xhr.addEventListener("load", doneHandler, false);
+	        $.xhr.addEventListener("error", doneHandler, false);
+	        $.xhr.addEventListener("timeout", doneHandler, false);
+	
+	        // Set up the basic query data from Resumable
+	        var query = [
+	          ["chunkNumberParameterName", $.offset + 1],
+	          ["chunkSizeParameterName", $.getOpt("chunkSize")],
+	          ["currentChunkSizeParameterName", $.endByte - $.startByte],
+	          ["totalSizeParameterName", $.fileObjSize],
+	          ["typeParameterName", $.fileObjType],
+	          ["identifierParameterName", $.fileObj.uniqueIdentifier],
+	          ["fileNameParameterName", $.fileObj.fileName],
+	          ["relativePathParameterName", $.fileObj.relativePath],
+	          ["totalChunksParameterName", $.fileObj.chunks.length],
+	          ["subjectParameterName", $.subject],
+	        ]
+	          .filter(function (pair) {
+	            // include items that resolve to truthy values
+	            // i.e. exclude false, null, undefined and empty strings
+	            return $.getOpt(pair[0]);
+	          })
+	          .reduce(function (query, pair) {
+	            // assign query key/value
+	            query[$.getOpt(pair[0])] = pair[1];
+	            return query;
+	          }, {});
+	        // Mix in custom data
+	        var customQuery = $.getOpt("query");
+	        if (typeof customQuery == "function")
+	          customQuery = customQuery($.fileObj, $);
+	        $h.each(customQuery, function (k, v) {
+	          query[k] = v;
+	        });
+	
+	        var func = $.fileObj.file.slice
+	          ? "slice"
+	          : $.fileObj.file.mozSlice
+	          ? "mozSlice"
+	          : $.fileObj.file.webkitSlice
+	          ? "webkitSlice"
+	          : "slice";
+	        var bytes = $.fileObj.file[func](
+	          $.startByte,
+	          $.endByte,
+	          $.getOpt("setChunkTypeFromFile") ? $.fileObj.file.type : ""
+	        );
+	        var data = null;
+	        var params = [];
+	
+	        var parameterNamespace = $.getOpt("parameterNamespace");
+	        if ($.getOpt("method") === "octet") {
+	          // Add data from the query options
+	          data = bytes;
+	          $h.each(query, function (k, v) {
+	            params.push(
+	              [
+	                encodeURIComponent(parameterNamespace + k),
+	                encodeURIComponent(v),
+	              ].join("=")
+	            );
+	          });
+	        } else {
+	          // Add data from the query options
+	          data = new FormData();
+	          $h.each(query, function (k, v) {
+	            data.append(parameterNamespace + k, v);
+	            params.push(
+	              [
+	                encodeURIComponent(parameterNamespace + k),
+	                encodeURIComponent(v),
+	              ].join("=")
+	            );
+	          });
+	          if ($.getOpt("chunkFormat") == "blob") {
+	            data.append(
+	              parameterNamespace + $.getOpt("fileParameterName"),
+	              bytes,
+	              $.fileObj.fileName
+	            );
+	          } else if ($.getOpt("chunkFormat") == "base64") {
+	            var fr = new FileReader();
+	            fr.onload = function (e) {
+	              data.append(
+	                parameterNamespace + $.getOpt("fileParameterName"),
+	                fr.result
+	              );
+	              $.xhr.send(data);
+	            };
+	            fr.readAsDataURL(bytes);
+	          }
+	        }
+	
+	        var target = $h.getTarget("upload", params);
+	        var method = $.getOpt("uploadMethod");
+	
+	        $.xhr.open(method, target);
+	        if ($.getOpt("method") === "octet") {
+	          $.xhr.setRequestHeader("Content-Type", "application/octet-stream");
+	        }
+	        $.xhr.timeout = $.getOpt("xhrTimeout");
+	        $.xhr.withCredentials = $.getOpt("withCredentials");
+	        // Add data from header options
+	        var customHeaders = $.getOpt("headers");
+	        if (typeof customHeaders === "function") {
+	          customHeaders = customHeaders($.fileObj, $);
+	        }
+	
+	        $h.each(customHeaders, function (k, v) {
+	          $.xhr.setRequestHeader(k, v);
+	        });
+	
+	        if ($.getOpt("chunkFormat") == "blob") {
+	          $.xhr.send(data);
+	        }
+	      };
+	      $.abort = function () {
+	        // Abort and reset
+	        if ($.xhr) $.xhr.abort();
+	        $.xhr = null;
+	      };
+	      $.status = function () {
+	        // Returns: 'pending', 'uploading', 'success', 'error'
+	        if ($.pendingRetry) {
+	          // if pending retry then that's effectively the same as actively uploading,
+	          // there might just be a slight delay before the retry starts
+	          return "uploading";
+	        } else if (!$.xhr) {
+	          return "pending";
+	        } else if ($.xhr.readyState < 4) {
+	          // Status is really 'OPENED', 'HEADERS_RECEIVED' or 'LOADING' - meaning that stuff is happening
+	          return "uploading";
+	        } else {
+	          if ($.xhr.status == 200 || $.xhr.status == 201) {
+	            // HTTP 200, 201 (created)
+	            return "success";
+	          } else if (
+	            $h.contains($.getOpt("permanentErrors"), $.xhr.status) ||
+	            $.retries >= $.getOpt("maxChunkRetries")
+	          ) {
+	            // HTTP 415/500/501, permanent error
+	            return "error";
+	          } else {
+	            // this should never happen, but we'll reset and queue a retry
+	            // a likely case for this would be 503 service unavailable
+	            $.abort();
+	            return "pending";
+	          }
+	        }
+	      };
+	      $.message = function () {
+	        return $.xhr ? $.xhr.responseText : "";
+	      };
+	      $.progress = function (relative) {
+	        if (typeof relative === "undefined") relative = false;
+	        var factor = relative ? ($.endByte - $.startByte) / $.fileObjSize : 1;
+	        if ($.pendingRetry) return 0;
+	        if (!$.xhr || !$.xhr.status) factor *= 0.95;
+	        var s = $.status();
+	        switch (s) {
+	          case "success":
+	          case "error":
+	            return 1 * factor;
+	          case "pending":
+	            return 0 * factor;
+	          default:
+	            return ($.loaded / ($.endByte - $.startByte)) * factor;
+	        }
+	      };
+	      return this;
+	    }
+	
+	    // QUEUE
+	    $.uploadNextChunk = function () {
+	      var found = false;
+	
+	      // In some cases (such as videos) it's really handy to upload the first
+	      // and last chunk of a file quickly; this let's the server check the file's
+	      // metadata and determine if there's even a point in continuing.
+	      if ($.getOpt("prioritizeFirstAndLastChunk")) {
+	        $h.each($.files, function (file) {
+	          if (
+	            file.chunks.length &&
+	            file.chunks[0].status() == "pending" &&
+	            file.chunks[0].preprocessState === 0
+	          ) {
+	            file.chunks[0].send();
+	            found = true;
+	            return false;
+	          }
+	          if (
+	            file.chunks.length > 1 &&
+	            file.chunks[file.chunks.length - 1].status() == "pending" &&
+	            file.chunks[file.chunks.length - 1].preprocessState === 0
+	          ) {
+	            file.chunks[file.chunks.length - 1].send();
+	            found = true;
+	            return false;
+	          }
+	        });
+	        if (found) return true;
+	      }
+	
+	      // Now, simply look for the next, best thing to upload
+	      $h.each($.files, function (file) {
+	        if (file.isPaused() === false) {
+	          $h.each(file.chunks, function (chunk) {
+	            if (chunk.status() == "pending" && chunk.preprocessState === 0) {
+	              chunk.send();
+	              found = true;
+	              return false;
+	            }
+	          });
+	        }
+	        if (found) return false;
+	      });
+	      if (found) return true;
+	
+	      // The are no more outstanding chunks to upload, check is everything is done
+	      var outstanding = false;
+	      $h.each($.files, function (file) {
+	        if (!file.isComplete()) {
+	          outstanding = true;
+	          return false;
+	        }
+	      });
+	      if (!outstanding) {
+	        // All chunks have been uploaded, complete
+	        $.fire("complete");
+	      }
+	      return false;
+	    };
+	
+	    // PUBLIC METHODS FOR RESUMABLE.JS
+	    $.assignBrowse = function (domNodes, isDirectory) {
+	      if (typeof domNodes.length == "undefined") domNodes = [domNodes];
+	
+	      $h.each(domNodes, function (domNode) {
+	        var input;
+	        if (domNode.tagName === "INPUT" && domNode.type === "file") {
+	          input = domNode;
+	        } else {
+	          input = document.createElement("input");
+	          input.setAttribute("type", "file");
+	          input.style.display = "none";
+	          domNode.addEventListener(
+	            "click",
+	            function () {
+	              input.style.opacity = 0;
+	              input.style.display = "block";
+	              input.focus();
+	              input.click();
+	              input.style.display = "none";
+	            },
+	            false
+	          );
+	          domNode.appendChild(input);
+	        }
+	        var maxFiles = $.getOpt("maxFiles");
+	        if (typeof maxFiles === "undefined" || maxFiles != 1) {
+	          input.setAttribute("multiple", "multiple");
+	        } else {
+	          input.removeAttribute("multiple");
+	        }
+	        if (isDirectory) {
+	          input.setAttribute("webkitdirectory", "webkitdirectory");
+	        } else {
+	          input.removeAttribute("webkitdirectory");
+	        }
+	        var fileTypes = $.getOpt("fileType");
+	        if (typeof fileTypes !== "undefined" && fileTypes.length >= 1) {
+	          input.setAttribute(
+	            "accept",
+	            fileTypes
+	              .map(function (e) {
+	                return "." + e;
+	              })
+	              .join(",")
+	          );
+	        } else {
+	          input.removeAttribute("accept");
+	        }
+	        // When new files are added, simply append them to the overall list
+	        input.addEventListener(
+	          "change",
+	          function (e) {
+	            appendFilesFromFileList(e.target.files, e);
+	            var clearInput = $.getOpt("clearInput");
+	            if (clearInput) {
+	              e.target.value = "";
+	            }
+	          },
+	          false
+	        );
+	      });
+	    };
+	    $.assignDrop = function (domNodes) {
+	      if (typeof domNodes.length == "undefined") domNodes = [domNodes];
+	
+	      $h.each(domNodes, function (domNode) {
+	        domNode.addEventListener("dragover", preventDefault, false);
+	        domNode.addEventListener("dragenter", preventDefault, false);
+	        domNode.addEventListener("drop", onDrop, false);
+	      });
+	    };
+	    $.unAssignDrop = function (domNodes) {
+	      if (typeof domNodes.length == "undefined") domNodes = [domNodes];
+	
+	      $h.each(domNodes, function (domNode) {
+	        domNode.removeEventListener("dragover", preventDefault);
+	        domNode.removeEventListener("dragenter", preventDefault);
+	        domNode.removeEventListener("drop", onDrop);
+	      });
+	    };
+	    $.isUploading = function () {
+	      var uploading = false;
+	      $h.each($.files, function (file) {
+	        if (file.isUploading()) {
+	          uploading = true;
+	          return false;
+	        }
+	      });
+	      return uploading;
+	    };
+	    $.upload = function () {
+	      // Make sure we don't start too many uploads at once
+	      if ($.isUploading()) return;
+	      // Kick off the queue
+	      $.fire("uploadStart");
+	      for (var num = 1; num <= $.getOpt("simultaneousUploads"); num++) {
+	        $.uploadNextChunk();
+	      }
+	    };
+	    $.pause = function () {
+	      // Resume all chunks currently being uploaded
+	      $h.each($.files, function (file) {
+	        file.abort();
+	      });
+	      $.fire("pause");
+	    };
+	    $.cancel = function () {
+	      $.fire("beforeCancel");
+	      for (var i = $.files.length - 1; i >= 0; i--) {
+	        $.files[i].cancel();
+	      }
+	      $.fire("cancel");
+	    };
+	    $.progress = function () {
+	      var totalDone = 0;
+	      var totalSize = 0;
+	      // Resume all chunks currently being uploaded
+	      $h.each($.files, function (file) {
+	        totalDone += file.progress() * file.size;
+	        totalSize += file.size;
+	      });
+	      return totalSize > 0 ? totalDone / totalSize : 0;
+	    };
+	    $.addFile = function (file, event) {
+	      appendFilesFromFileList([file], event);
+	    };
+	    $.addFiles = function (files, event) {
+	      appendFilesFromFileList(files, event);
+	    };
+	    $.removeFile = function (file) {
+	      for (var i = $.files.length - 1; i >= 0; i--) {
+	        if ($.files[i] === file) {
+	          $.files.splice(i, 1);
+	        }
+	      }
+	    };
+	    $.getFromUniqueIdentifier = function (uniqueIdentifier) {
+	      var ret = false;
+	      $h.each($.files, function (f) {
+	        if (f.uniqueIdentifier == uniqueIdentifier) ret = f;
+	      });
+	      return ret;
+	    };
+	    $.getSize = function () {
+	      var totalSize = 0;
+	      $h.each($.files, function (file) {
+	        totalSize += file.size;
+	      });
+	      return totalSize;
+	    };
+	    $.handleDropEvent = function (e) {
+	      onDrop(e);
+	    };
+	    $.handleChangeEvent = function (e) {
+	      appendFilesFromFileList(e.target.files, e);
+	      e.target.value = "";
+	    };
+	    $.updateQuery = function (query) {
+	      $.opts.query = query;
+	    };
+	
+	    return this;
+	  };
+	
+	  // Node.js-style export for Node and Component
+	  if (true) {
+	    module.exports = Resumable;
+	  } else if (typeof define === "function" && define.amd) {
+	    // AMD/requirejs: Define the module
+	    define(function () {
+	      return Resumable;
+	    });
+	  } else {
+	    // Browser: Expose to window
+	    window.Resumable = Resumable;
+	  }
+	})();
+
+
+/***/ })
+/******/ ]);
+//# sourceMappingURL=http://127.0.0.1:8080/build/bundle.js.map

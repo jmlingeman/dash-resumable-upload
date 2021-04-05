@@ -21,7 +21,12 @@
         "name": "startUpload",
         "docblock": null,
         "modifiers": [],
-        "params": [],
+        "params": [
+          {
+            "name": "e",
+            "type": null
+          }
+        ],
         "returns": null
       },
       {
@@ -80,7 +85,7 @@
         "required": false,
         "description": "The service to send the files to",
         "defaultValue": {
-          "value": "'/upload'",
+          "value": "\"/upload\"",
           "computed": false
         }
       },
@@ -91,7 +96,7 @@
         "required": false,
         "description": "Class to add to the upload component by default",
         "defaultValue": {
-          "value": "'resumable-default'",
+          "value": "\"resumable-default\"",
           "computed": false
         }
       },
@@ -102,7 +107,7 @@
         "required": false,
         "description": "Class to add to the upload component when it is hovered",
         "defaultValue": {
-          "value": "'resumable-hovered'",
+          "value": "\"resumable-hovered\"",
           "computed": false
         }
       },
@@ -113,7 +118,7 @@
         "required": false,
         "description": "Class to add to the upload component when it is disabled",
         "defaultValue": {
-          "value": "'resumable-disabled'",
+          "value": "\"resumable-disabled\"",
           "computed": false
         }
       },
@@ -124,7 +129,7 @@
         "required": false,
         "description": "Class to add to the upload component when it is paused",
         "defaultValue": {
-          "value": "'resumable-paused'",
+          "value": "\"resumable-paused\"",
           "computed": false
         }
       },
@@ -135,7 +140,7 @@
         "required": false,
         "description": "Class to add to the upload component when it is complete",
         "defaultValue": {
-          "value": "'resumable-complete'",
+          "value": "\"resumable-complete\"",
           "computed": false
         }
       },
@@ -146,7 +151,7 @@
         "required": false,
         "description": "Class to add to the upload component when it is uploading",
         "defaultValue": {
-          "value": "'resumable-uploading'",
+          "value": "\"resumable-uploading\"",
           "computed": false
         }
       },
@@ -190,7 +195,7 @@
         "required": false,
         "description": "The string to display in the upload component",
         "defaultValue": {
-          "value": "'Click Here to Select a File'",
+          "value": "\"Click Here to Select a File\"",
           "computed": false
         }
       },
@@ -201,7 +206,7 @@
         "required": false,
         "description": "Message to display when upload completed",
         "defaultValue": {
-          "value": "'Complete! '",
+          "value": "\"Complete! \"",
           "computed": false
         }
       },
@@ -291,7 +296,51 @@
         "required": false,
         "description": "User supplied id of this component",
         "defaultValue": {
-          "value": "'default-uploader-id'",
+          "value": "\"default-uploader-id\"",
+          "computed": false
+        }
+      },
+      "isPaused": {
+        "type": {
+          "name": "bool"
+        },
+        "required": false,
+        "description": "",
+        "defaultValue": {
+          "value": "true",
+          "computed": false
+        }
+      },
+      "numFiles": {
+        "type": {
+          "name": "number"
+        },
+        "required": false,
+        "description": "",
+        "defaultValue": {
+          "value": "0",
+          "computed": false
+        }
+      },
+      "numCompleted": {
+        "type": {
+          "name": "number"
+        },
+        "required": false,
+        "description": "",
+        "defaultValue": {
+          "value": "0",
+          "computed": false
+        }
+      },
+      "lastUploadedFile": {
+        "type": {
+          "name": "string"
+        },
+        "required": false,
+        "description": "",
+        "defaultValue": {
+          "value": "\"\"",
           "computed": false
         }
       },
