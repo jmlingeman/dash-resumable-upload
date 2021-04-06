@@ -145,7 +145,8 @@ def decorate_server(server, temp_base, s3_interface):
                     s3_interface.upload_file(target_file_name, remote_file)
                     print("Finished uploading", remote_file, "to s3.")
 
-        return target_file_name
+            return target_file_name
+        return ""
 
 
 def get_chunk_name(uploaded_filename, chunk_number):
