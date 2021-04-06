@@ -36,8 +36,8 @@ export default class Upload extends Component {
           messageStatus: "Invalid file type!",
         });
       },
-      testMethod: "post",
-      testChunks: false,
+      testMethod: "get",
+      testChunks: true,
       headers: {},
       chunkSize: this.props.chunkSize,
       simultaneousUploads: this.props.simultaneousUploads,
@@ -171,12 +171,14 @@ export default class Upload extends Component {
 
   startUpload(e) {
     e.preventDefault();
+    if(!this.state.isUploading) {
     this.resumable.pause(false);
     this.resumable.upload();
     this.setState({
       isPaused: false,
       isUploading: true,
     });
+    };
   }
 
   toggleHovered() {
