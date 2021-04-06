@@ -142,9 +142,9 @@ def decorate_server(server, temp_base, s3_interface):
                         target_file_name.split(_os.sep)[1:-1]
                     )
                     remote_file = _os.path.join(
-                        subject_type, subject_number, remote_filename
+                        subject_type, subject_number, remote_directory
                     )
-                    s3_interface.upload_file(target_file_name, remote_directory)
+                    s3_interface.upload_file(target_file_name, remote_file)
                     print("Finished uploading", remote_file, "to s3.")
                     _os.remove(target_file_name)
 

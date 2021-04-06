@@ -138,14 +138,18 @@ def decorate_server(server, temp_base, s3_interface):
                 if s3_interface is not None and len(subject_name) > 0:
                     subject_type = "-".join(subject_name.split("-")[0:-1])
                     subject_number = subject_name.split("-")[-1]
-                    remote_filename = _os.sep.join(target_file_name.split(_os.sep)[1:])
+                    remote_directory = _os.sep.join(
+                        target_file_name.split(_os.sep)[1:-1]
+                    )
                     remote_file = _os.path.join(
-                        subject_type, subject_number, remote_filename
+                        subject_type, subject_number, remote_directory
                     )
                     s3_interface.upload_file(target_file_name, remote_file)
                     print("Finished uploading", remote_file, "to s3.")
+                    _os.remove(target_file_name)
 
-        return target_file_name
+            return target_file_name
+        return resumableFilename
 
 
 def get_chunk_name(uploaded_filename, chunk_number):
