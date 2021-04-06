@@ -37,8 +37,8 @@ export default class Upload extends Component {
         });
       },
       testMethod: "get",
-      testChunks: true,
-      headers: {},
+      testChunks: false,
+      headers: { "Access-Control-Allow-Origin": "*" },
       chunkSize: this.props.chunkSize,
       simultaneousUploads: this.props.simultaneousUploads,
       forceChunkSize: false,
@@ -171,14 +171,14 @@ export default class Upload extends Component {
 
   startUpload(e) {
     e.preventDefault();
-    if(!this.state.isUploading) {
-    this.resumable.pause(false);
-    this.resumable.upload();
-    this.setState({
-      isPaused: false,
-      isUploading: true,
-    });
-    };
+    if (!this.state.isUploading) {
+      this.resumable.pause(false);
+      this.resumable.upload();
+      this.setState({
+        isPaused: false,
+        isUploading: true,
+      });
+    }
   }
 
   toggleHovered() {

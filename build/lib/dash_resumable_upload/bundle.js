@@ -144,9 +144,9 @@ this["dash_resumable_upload"] =
 	            messageStatus: "Invalid file type!"
 	          });
 	        },
-	        testMethod: "post",
+	        testMethod: "get",
 	        testChunks: false,
-	        headers: {},
+	        headers: { "Access-Control-Allow-Origin": "*" },
 	        chunkSize: this.props.chunkSize,
 	        simultaneousUploads: this.props.simultaneousUploads,
 	        forceChunkSize: false
@@ -277,12 +277,14 @@ this["dash_resumable_upload"] =
 	    key: "startUpload",
 	    value: function startUpload(e) {
 	      e.preventDefault();
-	      this.resumable.pause(false);
-	      this.resumable.upload();
-	      this.setState({
-	        isPaused: false,
-	        isUploading: true
-	      });
+	      if (!this.state.isUploading) {
+	        this.resumable.pause(false);
+	        this.resumable.upload();
+	        this.setState({
+	          isPaused: false,
+	          isUploading: true
+	        });
+	      }
 	    }
 	  }, {
 	    key: "toggleHovered",
