@@ -162,7 +162,7 @@ this["dash_resumable_upload"] =
 	      ResumableField.on("fileAdded", function (file) {
 	        _this2.resumable.subject = $("#subject-number").text();
 	        var numFiles = _this2.state.numFiles;
-	        numFiles = numFiles + 1;
+	        numFiles = _this2.resumable.files.length;
 	        _this2.setState({ numFiles: numFiles });
 	        _this2.props.setProps({ numFiles: numFiles });
 	
@@ -2121,7 +2121,6 @@ this["dash_resumable_upload"] =
 	        "fileType",
 	        "fileTypeErrorCallback",
 	      ]);
-	      console.log(fileList);
 	      if (
 	        typeof o.maxFiles !== "undefined" &&
 	        o.maxFiles < fileList.length + $.files.length
