@@ -1934,7 +1934,10 @@ this["dash_resumable_upload"] =
 	          return custom(file, event);
 	        }
 	        var relativePath =
-	          file.webkitRelativePath || file.fileName || file.name; // Some confusion in different versions of Firefox
+	          file.webkitRelativePath ||
+	          file.relativePath ||
+	          file.fileName ||
+	          file.name; // Some confusion in different versions of Firefox
 	        var size = file.size;
 	        return size + "-" + relativePath.replace(/[^0-9a-zA-Z_-]/gim, "");
 	      },
@@ -2008,6 +2011,8 @@ this["dash_resumable_upload"] =
 	     */
 	    function processItem(item, path, items, cb) {
 	      var entry;
+	      console.log("PROCESSING");
+	      console.log(entry);
 	      if (item.isFile) {
 	        // file provided
 	        return item.file(function (file) {
@@ -2067,20 +2072,24 @@ this["dash_resumable_upload"] =
 	     */
 	    function processDirectory(directory, path, items, cb) {
 	      var dirReader = directory.createReader();
-	      dirReader.readEntries(function (entries) {
-	        if (!entries.length) {
-	          // empty directory, skip
-	          return cb();
-	        }
-	        // process all conversion callbacks, finally invoke own one
-	        processCallbacks(
-	          entries.map(function (entry) {
-	            // bind all properties except for callback
-	            return processItem.bind(null, entry, path, items);
-	          }),
-	          cb
-	        );
-	      });
+	
+	      function read() {
+	        dirReader.readEntries(function (entries) {
+	          if (!entries.length) {
+	            // empty directory, skip
+	            return cb();
+	          }
+	          // process all conversion callbacks, finally invoke own one
+	          processCallbacks(
+	            entries.map(function (entry) {
+	              // bind all properties except for callback
+	              return processItem.bind(null, entry, path, items);
+	            })
+	          );
+	          read();
+	        });
+	      }
+	      read();
 	    }
 	
 	    /**

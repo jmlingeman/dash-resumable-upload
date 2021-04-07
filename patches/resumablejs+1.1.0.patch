@@ -1,5 +1,5 @@
 diff --git a/node_modules/resumablejs/resumable.js b/node_modules/resumablejs/resumable.js
-index 649e6a2..b4d94ca 100644
+index 649e6a2..4de43f7 100644
 --- a/node_modules/resumablejs/resumable.js
 +++ b/node_modules/resumablejs/resumable.js
 @@ -1,15 +1,15 @@
@@ -226,7 +226,7 @@ index 649e6a2..b4d94ca 100644
        }
      };
  
-@@ -119,56 +152,56 @@
+@@ -119,56 +152,59 @@
      // fileSuccess(file), fileProgress(file), fileAdded(file, event), filesAdded(files, filesSkipped), fileRetry(file),
      // fileError(file, message), complete(), progress(), error(message, file), pause()
      $.events = [];
@@ -291,7 +291,10 @@ index 649e6a2..b4d94ca 100644
          }
 -        var relativePath = file.webkitRelativePath||file.fileName||file.name; // Some confusion in different versions of Firefox
 +        var relativePath =
-+          file.webkitRelativePath || file.fileName || file.name; // Some confusion in different versions of Firefox
++          file.webkitRelativePath ||
++          file.relativePath ||
++          file.fileName ||
++          file.name; // Some confusion in different versions of Firefox
          var size = file.size;
 -        return(size + '-' + relativePath.replace(/[^0-9a-zA-Z_-]/img, ''));
 +        return size + "-" + relativePath.replace(/[^0-9a-zA-Z_-]/gim, "");
@@ -305,7 +308,7 @@ index 649e6a2..b4d94ca 100644
            if (value == test) {
              result = true;
              return false;
-@@ -178,36 +211,39 @@
+@@ -178,36 +214,39 @@
  
          return result;
        },
@@ -362,7 +365,7 @@ index 649e6a2..b4d94ca 100644
        $h.stopEvent(event);
  
        //handle dropped things as items if we can (this lets us deal with folders nicer in some cases)
-@@ -219,7 +255,7 @@
+@@ -219,7 +258,7 @@
          loadFiles(event.dataTransfer.files, event);
        }
      };
@@ -371,11 +374,13 @@ index 649e6a2..b4d94ca 100644
        e.preventDefault();
      };
  
-@@ -232,31 +268,31 @@
+@@ -232,31 +271,33 @@
       */
      function processItem(item, path, items, cb) {
        var entry;
 -      if(item.isFile){
++      console.log("PROCESSING");
++      console.log(entry);
 +      if (item.isFile) {
          // file provided
 -        return item.file(function(file){
@@ -412,7 +417,7 @@ index 649e6a2..b4d94ca 100644
            item.relativePath = path + item.name;
            items.push(item);
          }
-@@ -264,7 +300,6 @@
+@@ -264,7 +305,6 @@
        cb(); // indicate processing is done
      }
  
@@ -420,7 +425,7 @@ index 649e6a2..b4d94ca 100644
      /**
       * cps-style list iteration.
       * invokes all functions in list and waits for their callback to be
-@@ -272,13 +307,13 @@
+@@ -272,13 +312,13 @@
       * @param  {Function[]}   items list of functions expecting callback parameter
       * @param  {Function} cb    callback to trigger after the last callback has been invoked
       */
@@ -437,7 +442,7 @@ index 649e6a2..b4d94ca 100644
          processCallbacks(items.slice(1), cb);
        });
      }
-@@ -290,16 +325,16 @@
+@@ -290,22 +330,26 @@
       * @param  {File[]}   items     target list of items
       * @param  {Function} cb        callback invoked after traversing directory
       */
@@ -446,19 +451,40 @@ index 649e6a2..b4d94ca 100644
        var dirReader = directory.createReader();
 -      dirReader.readEntries(function(entries){
 -        if(!entries.length){
-+      dirReader.readEntries(function (entries) {
-+        if (!entries.length) {
-           // empty directory, skip
-           return cb();
-         }
-         // process all conversion callbacks, finally invoke own one
-         processCallbacks(
+-          // empty directory, skip
+-          return cb();
+-        }
+-        // process all conversion callbacks, finally invoke own one
+-        processCallbacks(
 -          entries.map(function(entry){
-+          entries.map(function (entry) {
-             // bind all properties except for callback
-             return processItem.bind(null, entry, path, items);
-           }),
-@@ -314,58 +349,80 @@
+-            // bind all properties except for callback
+-            return processItem.bind(null, entry, path, items);
+-          }),
+-          cb
+-        );
+-      });
++
++      function read() {
++        dirReader.readEntries(function (entries) {
++          if (!entries.length) {
++            // empty directory, skip
++            return cb();
++          }
++          // process all conversion callbacks, finally invoke own one
++          processCallbacks(
++            entries.map(function (entry) {
++              // bind all properties except for callback
++              return processItem.bind(null, entry, path, items);
++            })
++          );
++          read();
++        });
++      }
++      read();
+     }
+ 
+     /**
+@@ -314,58 +358,80 @@
       * @param  {Event} event event that led to upload
       */
      function loadFiles(items, event) {
@@ -567,7 +593,7 @@ index 649e6a2..b4d94ca 100644
                fileTypeFound = true;
                break;
              }
-@@ -376,47 +433,49 @@
+@@ -376,47 +442,49 @@
            }
          }
  
@@ -637,7 +663,7 @@ index 649e6a2..b4d94ca 100644
            // non-Promise provided as unique identifier, process synchronously
            addFile(uniqueIdentifier);
          }
-@@ -424,266 +483,291 @@
+@@ -424,266 +492,291 @@
      };
  
      // INTERNAL OBJECT TYPES
@@ -1057,7 +1083,7 @@ index 649e6a2..b4d94ca 100644
            $.test();
            return;
          }
-@@ -692,29 +776,36 @@
+@@ -692,29 +785,36 @@
          $.xhr = new XMLHttpRequest();
  
          // Progress
@@ -1107,7 +1133,7 @@ index 649e6a2..b4d94ca 100644
                $.pendingRetry = true;
                setTimeout($.send, retryInterval);
              } else {
-@@ -722,363 +813,414 @@
+@@ -722,363 +822,414 @@
              }
            }
          };
@@ -1520,12 +1546,12 @@ index 649e6a2..b4d94ca 100644
 +          input.setAttribute("webkitdirectory", "webkitdirectory");
          } else {
 -          input.removeAttribute('webkitdirectory');
-+          input.removeAttribute("webkitdirectory");
-         }
+-        }
 -        var fileTypes = $.getOpt('fileType');
 -        if (typeof (fileTypes) !== 'undefined' && fileTypes.length >= 1) {
 -          input.setAttribute('accept', fileTypes.map(function (e) { return '.' + e }).join(','));
--        }
++          input.removeAttribute("webkitdirectory");
+         }
 -        else {
 -          input.removeAttribute('accept');
 +        var fileTypes = $.getOpt("fileType");
