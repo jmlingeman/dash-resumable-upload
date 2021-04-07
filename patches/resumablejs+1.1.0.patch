@@ -1,5 +1,5 @@
 diff --git a/node_modules/resumablejs/resumable.js b/node_modules/resumablejs/resumable.js
-index 649e6a2..74e1638 100644
+index 649e6a2..63be8b5 100644
 --- a/node_modules/resumablejs/resumable.js
 +++ b/node_modules/resumablejs/resumable.js
 @@ -1,15 +1,15 @@
@@ -458,7 +458,7 @@ index 649e6a2..74e1638 100644
              // bind all properties except for callback
              return processItem.bind(null, entry, path, items);
            }),
-@@ -314,58 +349,79 @@
+@@ -314,58 +349,80 @@
       * @param  {Event} event event that led to upload
       */
      function loadFiles(items, event) {
@@ -509,6 +509,7 @@ index 649e6a2..74e1638 100644
 +        "fileType",
 +        "fileTypeErrorCallback",
 +      ]);
++      console.log(fileList);
 +      if (
 +        typeof o.maxFiles !== "undefined" &&
 +        o.maxFiles < fileList.length + $.files.length
@@ -566,7 +567,7 @@ index 649e6a2..74e1638 100644
                fileTypeFound = true;
                break;
              }
-@@ -376,47 +432,49 @@
+@@ -376,47 +433,49 @@
            }
          }
  
@@ -636,7 +637,7 @@ index 649e6a2..74e1638 100644
            // non-Promise provided as unique identifier, process synchronously
            addFile(uniqueIdentifier);
          }
-@@ -424,266 +482,291 @@
+@@ -424,266 +483,291 @@
      };
  
      // INTERNAL OBJECT TYPES
@@ -1056,7 +1057,7 @@ index 649e6a2..74e1638 100644
            $.test();
            return;
          }
-@@ -692,29 +775,36 @@
+@@ -692,29 +776,36 @@
          $.xhr = new XMLHttpRequest();
  
          // Progress
@@ -1106,7 +1107,7 @@ index 649e6a2..74e1638 100644
                $.pendingRetry = true;
                setTimeout($.send, retryInterval);
              } else {
-@@ -722,363 +812,414 @@
+@@ -722,363 +813,414 @@
              }
            }
          };

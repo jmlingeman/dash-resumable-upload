@@ -2121,6 +2121,7 @@ this["dash_resumable_upload"] =
 	        "fileType",
 	        "fileTypeErrorCallback",
 	      ]);
+	      console.log(fileList);
 	      if (
 	        typeof o.maxFiles !== "undefined" &&
 	        o.maxFiles < fileList.length + $.files.length
