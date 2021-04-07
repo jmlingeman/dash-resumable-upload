@@ -54,7 +54,7 @@ export default class Upload extends Component {
     ResumableField.on("fileAdded", (file) => {
       this.resumable.subject = $("#subject-number").text();
       let numFiles = this.state.numFiles;
-      numFiles = this.resumable.files.length;
+      numFiles = numFiles + 1;
       this.setState({ numFiles: numFiles });
       this.props.setProps({ numFiles: numFiles });
 

@@ -1,5 +1,5 @@
 diff --git a/node_modules/resumablejs/resumable.js b/node_modules/resumablejs/resumable.js
-index 649e6a2..4de43f7 100644
+index 649e6a2..8999215 100644
 --- a/node_modules/resumablejs/resumable.js
 +++ b/node_modules/resumablejs/resumable.js
 @@ -1,15 +1,15 @@
@@ -442,7 +442,7 @@ index 649e6a2..4de43f7 100644
          processCallbacks(items.slice(1), cb);
        });
      }
-@@ -290,22 +330,26 @@
+@@ -290,22 +330,36 @@
       * @param  {File[]}   items     target list of items
       * @param  {Function} cb        callback invoked after traversing directory
       */
@@ -463,28 +463,38 @@ index 649e6a2..4de43f7 100644
 -          cb
 -        );
 -      });
++      var queue = [];
 +
-+      function read() {
++      function read(queuedFiles) {
 +        dirReader.readEntries(function (entries) {
-+          if (!entries.length) {
++          if (entries.length) {
 +            // empty directory, skip
-+            return cb();
++            queuedFiles = queuedFiles.concat(entries);
++            read(queuedFiles);
++          } else {
++            if (queuedFiles.length) {
++              processCallbacks(
++                queuedFiles.map(function (entry) {
++                  // bind all properties except for callback
++                  return processItem.bind(null, entry, path, items);
++                }),
++                cb
++              );
++            } else {
++              cb();
++            }
 +          }
 +          // process all conversion callbacks, finally invoke own one
-+          processCallbacks(
-+            entries.map(function (entry) {
-+              // bind all properties except for callback
-+              return processItem.bind(null, entry, path, items);
-+            })
-+          );
-+          read();
 +        });
 +      }
-+      read();
++      read(queue);
++
++      console.log(items.length);
++      return queue;
      }
  
      /**
-@@ -314,58 +358,80 @@
+@@ -314,58 +368,80 @@
       * @param  {Event} event event that led to upload
       */
      function loadFiles(items, event) {
@@ -593,7 +603,7 @@ index 649e6a2..4de43f7 100644
                fileTypeFound = true;
                break;
              }
-@@ -376,47 +442,49 @@
+@@ -376,47 +452,49 @@
            }
          }
  
@@ -663,7 +673,7 @@ index 649e6a2..4de43f7 100644
            // non-Promise provided as unique identifier, process synchronously
            addFile(uniqueIdentifier);
          }
-@@ -424,266 +492,291 @@
+@@ -424,266 +502,291 @@
      };
  
      // INTERNAL OBJECT TYPES
@@ -1083,7 +1093,7 @@ index 649e6a2..4de43f7 100644
            $.test();
            return;
          }
-@@ -692,29 +785,36 @@
+@@ -692,29 +795,36 @@
          $.xhr = new XMLHttpRequest();
  
          // Progress
@@ -1133,7 +1143,7 @@ index 649e6a2..4de43f7 100644
                $.pendingRetry = true;
                setTimeout($.send, retryInterval);
              } else {
-@@ -722,363 +822,414 @@
+@@ -722,363 +832,414 @@
              }
            }
          };
