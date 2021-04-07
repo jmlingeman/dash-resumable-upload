@@ -2145,6 +2145,7 @@ this["dash_resumable_upload"] =
 	          }
 	          window.setTimeout(function () {
 	            $.fire("filesAdded", files, filesSkipped);
+	            console.log(filesSkipped);
 	          }, 0);
 	        }
 	      };
