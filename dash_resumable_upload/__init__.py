@@ -32,7 +32,7 @@ for _component in _components:
     setattr(_component, "_css_dist", _css_dist)
 
 
-def decorate_server(server, temp_base, s3_interface):
+def decorate_server(server, temp_base, s3_interface=None, file_processor=None):
     # resumable.js uses a GET request to check if it uploaded the file already.
     # NOTE: your validation here needs to match whatever you do in the POST
     # (otherwise it will NEVER find the files)
@@ -144,9 +144,15 @@ def decorate_server(server, temp_base, s3_interface):
                     remote_file = _os.path.join(
                         subject_type, subject_number, remote_directory
                     )
-                    s3_interface.upload_file(target_file_name, remote_file)
+                    s3_path = s3_interface.upload_file(target_file_name, remote_file)
+
                     print("Finished uploading", remote_file, "to s3.")
                     _os.remove(target_file_name)
+                    # Process the uploaded file
+                    if file_processor is not None:
+                        print("Processing", s3_path)
+                        file_processor(s3_interface, s3_path, subject_name)
+                        print("Processed!", s3_path)
 
             return target_file_name
         return resumableFilename
