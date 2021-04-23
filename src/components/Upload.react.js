@@ -97,7 +97,7 @@ export default class Upload extends Component {
         {
           fileList: { files: currentFiles },
           messageStatus:
-            this.props.completedMessage + file.fileName || fileServer,
+            this.props.completedMessage + file.fileName + ". Files remaining: " + (this.state.numFiles - this.fileNames.length)|| fileServer,
         },
         () => {
           if (typeof this.props.onFileSuccess === "function") {
@@ -479,7 +479,7 @@ Upload.defaultProps = {
   activeStyle: {},
   completeStyle: {},
   textLabel: "Click Here to Select a File",
-  completedMessage: "Complete! ",
+  completedMessage: "Finished processing ",
   fileNames: [],
   filetypes: undefined,
   startButton: true,
