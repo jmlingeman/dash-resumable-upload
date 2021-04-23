@@ -97,7 +97,7 @@ export default class Upload extends Component {
         {
           fileList: { files: currentFiles },
           messageStatus:
-            this.props.completedMessage + file.fileName + ". Files remaining to process: " + (this.state.numFiles - this.state.numCompleted)|| fileServer,
+            this.props.completedMessage + file.fileName + ". Files remaining to process: " + (this.state.numFiles - this.state.numCompleted) || fileServer,
         },
         () => {
           if (typeof this.props.onFileSuccess === "function") {
