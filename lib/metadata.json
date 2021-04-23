@@ -206,7 +206,7 @@
         "required": false,
         "description": "Message to display when upload completed",
         "defaultValue": {
-          "value": "\"Complete! \"",
+          "value": "\"Finished processing \"",
           "computed": false
         }
       },
